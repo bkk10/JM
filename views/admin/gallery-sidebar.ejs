@@ -1,0 +1,95 @@
+<div class="admin-content">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h2>Gallery Management</h2>
+    <button class="button" onclick="document.getElementById('uploadForm').style.display='block'">
+      + Upload New Image
+    </button>
+  </div>
+  
+  <% if (success) { %>
+    <div class="alert success" style="margin-bottom: 20px;">
+      ✅ Gallery updated successfully!
+    </div>
+  <% } %>
+  
+  <% if (error) { %>
+    <div class="alert error" style="margin-bottom: 20px;">
+      ❌ Error: <%= error %>
+    </div>
+  <% } %>
+  
+  <!-- Upload Form -->
+  <div id="uploadForm" style="display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3 style="margin-top: 0;">Upload Image</h3>
+    <form action="/admin/gallery/upload" method="post" enctype="multipart/form-data">
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;">Select Image</label>
+        <input type="file" name="image" accept="image/*" required style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;">Caption (optional)</label>
+        <input type="text" name="caption" placeholder="Enter image caption" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" class="button">Upload</button>
+        <button type="button" class="button ghost" onclick="document.getElementById('uploadForm').style.display='none'">Cancel</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Gallery Images -->
+  <% if (images && images.length > 0) { %>
+    <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+      <% images.forEach(image => { %>
+        <div style="border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+          <img src="/uploads/<%= image.filename %>" 
+               alt="<%= image.caption || 'Gallery image' %>" 
+               style="width: 100%; height: 180px; object-fit: cover;">
+          <div style="padding: 15px;">
+            <p style="margin: 0 0 10px 0; font-size: 14px;"><strong><%= image.caption || 'No caption' %></strong></p>
+            <p style="margin: 0 0 10px 0; font-size: 12px; color: #666;">
+              <%= image.filename %><br>
+              <%= new Date(image.created_at).toLocaleDateString() %>
+            </p>
+            <form action="/admin/gallery/delete/<%= image.id %>" method="post" style="margin: 0;">
+              <button type="submit" class="button danger" style="padding: 5px 10px; font-size: 12px;" 
+                      onclick="return confirm('Delete this image?')">
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 8px;">
+      <p style="color: #666;">No images in gallery yet. Upload your first image!</p>
+    </div>
+  <% } %>
+</div>
+
+<style>
+  .alert {
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .alert.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  .alert.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  .button.danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+  }
+  .button.danger:hover {
+    background: #c82333;
+  }
+</style>

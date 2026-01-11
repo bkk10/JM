@@ -1,0 +1,312 @@
+<div class="admin-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>Edit Site Content</h1>
+    <div style="display: flex; gap: 8px;">
+      <a href="/admin/visual" class="btn-admin btn-secondary">🎨 Visual Editor</a>
+      <a href="/admin/gallery" class="btn-admin btn-secondary">🖼️ Manage Images</a>
+    </div>
+  </div>
+  
+  <p>Edit the text content that appears on your website. Changes are saved immediately.</p>
+  
+  <form method="post" action="/admin/content">
+    <!-- Hero Section -->
+    <div class="admin-card" style="margin: 24px 0;">
+      <h2>Hero Section</h2>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Kicker Text</label>
+        <input class="inline-edit" type="text" name="hero_kicker" 
+               value="<%= content.hero_kicker || '' %>" 
+               placeholder="Level 3 • Kapsoya, Ainabkoi · Uasin Gishu" 
+               style="width: 100%;">
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Main Title</label>
+        <textarea class="inline-edit" name="hero_title" rows="2" 
+                  placeholder="Healthcare that feels personal—delivered with precision."
+                  style="width: 100%; resize: vertical;"><%= content.hero_title || '' %></textarea>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Introduction Text</label>
+        <textarea class="inline-edit" name="hero_intro" rows="3"
+                  style="width: 100%; resize: vertical;"><%= content.hero_intro || '' %></textarea>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-size: 14px;">Badge 1</label>
+          <input class="inline-edit" type="text" name="hero_badge1" 
+                 value="<%= content.hero_badge1 || '' %>" 
+                 placeholder="Open and fully operational">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-size: 14px;">Badge 2</label>
+          <input class="inline-edit" type="text" name="hero_badge2" 
+                 value="<%= content.hero_badge2 || '' %>" 
+                 placeholder="Modern diagnostics & imaging">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-size: 14px;">Badge 3</label>
+          <input class="inline-edit" type="text" name="hero_badge3" 
+                 value="<%= content.hero_badge3 || '' %>" 
+                 placeholder="Optician services & prescription glasses">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-size: 14px;">Badge 4</label>
+          <input class="inline-edit" type="text" name="hero_badge4" 
+                 value="<%= content.hero_badge4 || '' %>" 
+                 placeholder="Powered by EasyClinic operations">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Why Choose Us Section -->
+    <div class="admin-card" style="margin: 24px 0;">
+      <h2>Why Choose Us</h2>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Section Title</label>
+        <input class="inline-edit" type="text" name="why_title" 
+               value="<%= content.why_title || '' %>" 
+               placeholder="Why patients choose Jedi" 
+               style="width: 100%;">
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;">
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 8px;">Card 1</h3>
+          <input class="inline-edit" type="text" name="why_card1_title" 
+                 value="<%= content.why_card1_title || '' %>" 
+                 placeholder="Experienced Team" 
+                 style="width: 100%; margin-bottom: 8px;">
+          <textarea class="inline-edit" name="why_card1_body" rows="3"
+                    placeholder="Clinicians with broad hands-on experience..."
+                    style="width: 100%; resize: vertical;"><%= content.why_card1_body || '' %></textarea>
+        </div>
+        
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 8px;">Card 2</h3>
+          <input class="inline-edit" type="text" name="why_card2_title" 
+                 value="<%= content.why_card2_title || '' %>" 
+                 placeholder="Modern Equipment" 
+                 style="width: 100%; margin-bottom: 8px;">
+          <textarea class="inline-edit" name="why_card2_body" rows="3"
+                    placeholder="From labs to imaging..."
+                    style="width: 100%; resize: vertical;"><%= content.why_card2_body || '' %></textarea>
+        </div>
+        
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 8px;">Card 3</h3>
+          <input class="inline-edit" type="text" name="why_card3_title" 
+                 value="<%= content.why_card3_title || '' %>" 
+                 placeholder="Clean & Safe" 
+                 style="width: 100%; margin-bottom: 8px;">
+          <textarea class="inline-edit" name="why_card3_body" rows="3"
+                    placeholder="Strict hygiene protocols..."
+                    style="width: 100%; resize: vertical;"><%= content.why_card3_body || '' %></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- About Section -->
+    <div class="admin-card" style="margin: 24px 0;">
+      <h2>About Section</h2>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Section Title</label>
+        <input class="inline-edit" type="text" name="about_title" 
+               value="<%= content.about_title || '' %>" 
+               placeholder="About Jedi Medical" 
+               style="width: 100%;">
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">First Paragraph</label>
+        <textarea class="inline-edit" name="about_body1" rows="3"
+                  style="width: 100%; resize: vertical;"><%= content.about_body1 || '' %></textarea>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Second Paragraph</label>
+        <textarea class="inline-edit" name="about_body2" rows="3"
+                  style="width: 100%; resize: vertical;"><%= content.about_body2 || '' %></textarea>
+      </div>
+    </div>
+
+    <!-- Testimonials Section -->
+<div class="admin-card" style="margin: 24px 0;">
+  <h2>Testimonials</h2>
+  
+  <p style="color: #666; margin-bottom: 16px; font-size: 14px;">
+    Click "Add Testimonial" to add more. Empty testimonials will not show on the website.
+  </p>
+  
+  <div id="testimonials-container">
+    <% 
+      // Get all testimonial data - SIMPLIFIED
+      const testimonials = [];
+      
+      // Check for up to 20 testimonials
+      for (let i = 1; i <= 20; i++) {
+        const quoteKey = `testimonial_quote${i}`;
+        const badgeKey = `testimonial_badge${i}`;
+        const quote = content && content[quoteKey] || '';
+        const badge = content && content[badgeKey] || '';
+        
+        testimonials.push({
+          number: i,
+          quote: quote,
+          badge: badge
+        });
+      }
+      
+      // Render existing testimonials
+      testimonials.forEach(testimonial => {
+    %>
+      <div class="testimonial-item" style="margin-bottom: 24px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 16px; margin: 0; color: #0d1b12;">Testimonial <%= testimonial.number %></h3>
+          <% if (testimonial.number > 3) { %>
+            <button type="button" class="remove-testimonial" data-number="<%= testimonial.number %>" 
+                    style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer;">
+              Remove
+            </button>
+          <% } %>
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; margin-bottom: 4px; font-size: 14px; font-weight: 500;">Quote</label>
+          <textarea class="inline-edit" name="testimonial_quote<%= testimonial.number %>" rows="4"
+                    placeholder="The team at Jedi Medical listened carefully, explained everything clearly..."
+                    style="width: 100%; resize: vertical; padding: 12px; border: 1px solid #ddd; border-radius: 6px;"><%= testimonial.quote %></textarea>
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 4px; font-size: 14px; font-weight: 500;">Author</label>
+          <input class="inline-edit" type="text" name="testimonial_badge<%= testimonial.number %>" 
+                 value="<%= testimonial.badge %>" 
+                 placeholder="— Mary K., Kapsoya" 
+                 style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+        </div>
+      </div>
+    <% }); %>
+  </div>
+  
+  <div style="margin-top: 16px;">
+    <button type="button" id="add-testimonial" 
+            style="background: #23b371; color: white; border: none; border-radius: 6px; padding: 10px 16px; font-size: 14px; cursor: pointer;">
+      ＋ Add Another Testimonial
+    </button>
+  </div>
+  
+  <div style="margin-top: 20px;">
+    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tagline (optional)</label>
+    <input class="inline-edit" type="text" name="testimonials_tagline" 
+           value="<%= content && content.testimonials_tagline || '' %>" 
+           placeholder="Testimonials slide automatically every 5 seconds" 
+           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+    <p style="color: #666; font-size: 13px; margin-top: 4px;">
+      This text appears below the "What Our Patients Say" title.
+    </p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let nextTestimonialNumber = 21; // Start after the first 20
+    
+    // Add testimonial button
+    const addButton = document.getElementById('add-testimonial');
+    if (addButton) {
+      addButton.addEventListener('click', function() {
+        const container = document.getElementById('testimonials-container');
+        
+        const newTestimonial = document.createElement('div');
+        newTestimonial.className = 'testimonial-item';
+        newTestimonial.style.cssText = 'margin-bottom: 24px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;';
+        
+        newTestimonial.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 16px; margin: 0; color: #0d1b12;">Testimonial ${nextTestimonialNumber}</h3>
+            <button type="button" class="remove-testimonial" data-number="${nextTestimonialNumber}" 
+                    style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer;">
+              Remove
+            </button>
+          </div>
+          
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; margin-bottom: 4px; font-size: 14px; font-weight: 500;">Quote</label>
+            <textarea class="inline-edit" name="testimonial_quote${nextTestimonialNumber}" rows="4"
+                      placeholder="The team at Jedi Medical listened carefully, explained everything clearly..."
+                      style="width: 100%; resize: vertical; padding: 12px; border: 1px solid #ddd; border-radius: 6px;"></textarea>
+          </div>
+          
+          <div>
+            <label style="display: block; margin-bottom: 4px; font-size: 14px; font-weight: 500;">Author</label>
+            <input class="inline-edit" type="text" name="testimonial_badge${nextTestimonialNumber}" 
+                   placeholder="— Mary K., Kapsoya" 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+          </div>
+        `;
+        
+        container.appendChild(newTestimonial);
+        nextTestimonialNumber++;
+        
+        // Scroll to new testimonial
+        newTestimonial.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+    
+    // Remove testimonial button (event delegation)
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('remove-testimonial')) {
+        if (confirm('Are you sure you want to remove this testimonial?')) {
+          const testimonialItem = e.target.closest('.testimonial-item');
+          if (testimonialItem) {
+            testimonialItem.remove();
+          }
+        }
+      }
+    });
+  });
+</script>
+
+    <!-- Contact Section -->
+    <div class="admin-card" style="margin: 24px 0;">
+      <h2>Contact Section</h2>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Section Title</label>
+        <input class="inline-edit" type="text" name="contact_title" 
+               value="<%= content.contact_title || '' %>" 
+               placeholder="Book an Appointment" 
+               style="width: 100%;">
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Introduction Text</label>
+        <textarea class="inline-edit" name="contact_intro" rows="3"
+                  style="width: 100%; resize: vertical;"><%= content.contact_intro || '' %></textarea>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Note Text</label>
+        <input class="inline-edit" type="text" name="contact_note" 
+               value="<%= content.contact_note || '' %>" 
+               placeholder="Prefer a call? Add your phone number..." 
+               style="width: 100%;">
+      </div>
+    </div>
+    
+    <!-- Save Button -->
+    <div class="admin-form-actions">
+      <button type="submit" class="btn-admin btn-primary" style="padding: 12px 24px;">
+        💾 Save All Changes
+      </button>
+      <a href="/admin/dashboard" class="btn-admin btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>

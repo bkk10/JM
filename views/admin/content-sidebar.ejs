@@ -1,0 +1,208 @@
+<div class="admin-card">
+  <h1>📝 Edit Site Content</h1>
+  <p>Edit the text content that appears on your website. Changes are saved immediately.</p>
+  
+  <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+    <a href="/admin/visual" class="btn btn-secondary">🎨 Visual Editor</a>
+    <a href="/admin/section-images" class="btn btn-secondary">🖼️ Manage Images</a>
+    <a href="/admin/gallery" class="btn btn-secondary">🖼️ Gallery</a>
+  </div>
+</div>
+
+<form method="post" action="/admin/content">
+  <!-- Hero Section -->
+  <div class="admin-card">
+    <h2>🏠 Hero Section</h2>
+    
+    <div class="form-group">
+      <label>Kicker Text</label>
+      <input type="text" name="hero_kicker" class="form-control"
+             value="<%= content.hero_kicker || '' %>" 
+             placeholder="Level 3 • Kapsoya, Ainabkoi · Uasin Gishu">
+    </div>
+    
+    <div class="form-group">
+      <label>Main Title</label>
+      <textarea name="hero_title" class="form-control" rows="3"
+                placeholder="Healthcare that feels personal—delivered with precision."><%= content.hero_title || '' %></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>Introduction Text</label>
+      <textarea name="hero_intro" class="form-control" rows="4"
+                placeholder="Welcome to JediCare Medical centre..."><%= content.hero_intro || '' %></textarea>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+      <div class="form-group">
+        <label>Badge 1</label>
+        <input type="text" name="hero_badge1" class="form-control"
+               value="<%= content.hero_badge1 || '' %>" 
+               placeholder="Open and fully operational">
+      </div>
+      <div class="form-group">
+        <label>Badge 2</label>
+        <input type="text" name="hero_badge2" class="form-control"
+               value="<%= content.hero_badge2 || '' %>" 
+               placeholder="Modern diagnostics & imaging">
+      </div>
+      <div class="form-group">
+        <label>Badge 3</label>
+        <input type="text" name="hero_badge3" class="form-control"
+               value="<%= content.hero_badge3 || '' %>" 
+               placeholder="Optician services & glasses">
+      </div>
+      <div class="form-group">
+        <label>Badge 4</label>
+        <input type="text" name="hero_badge4" class="form-control"
+               value="<%= content.hero_badge4 || '' %>" 
+               placeholder="Powered by EasyClinic">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Why Choose Us Section -->
+  <div class="admin-card">
+    <h2>⭐ Why Choose Us</h2>
+    
+    <div class="form-group">
+      <label>Section Title</label>
+      <input type="text" name="why_title" class="form-control"
+             value="<%= content.why_title || '' %>" 
+             placeholder="Why patients choose Jedi">
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <div class="form-group">
+        <label>Card 1 Title</label>
+        <input type="text" name="why_card1_title" class="form-control"
+               value="<%= content.why_card1_title || '' %>" 
+               placeholder="Experienced Team">
+        <label style="margin-top: 12px;">Card 1 Content</label>
+        <textarea name="why_card1_body" class="form-control" rows="4"
+                  placeholder="Clinicians with broad hands-on experience..."><%= content.why_card1_body || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Card 2 Title</label>
+        <input type="text" name="why_card2_title" class="form-control"
+               value="<%= content.why_card2_title || '' %>" 
+               placeholder="Modern Equipment">
+        <label style="margin-top: 12px;">Card 2 Content</label>
+        <textarea name="why_card2_body" class="form-control" rows="4"
+                  placeholder="From labs to imaging..."><%= content.why_card2_body || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Card 3 Title</label>
+        <input type="text" name="why_card3_title" class="form-control"
+               value="<%= content.why_card3_title || '' %>" 
+               placeholder="Clean & Safe">
+        <label style="margin-top: 12px;">Card 3 Content</label>
+        <textarea name="why_card3_body" class="form-control" rows="4"
+                  placeholder="Strict hygiene protocols..."><%= content.why_card3_body || '' %></textarea>
+      </div>
+    </div>
+  </div>
+  
+  <!-- About Section -->
+  <div class="admin-card">
+    <h2>📋 About Section</h2>
+    
+    <div class="form-group">
+      <label>Section Title</label>
+      <input type="text" name="about_title" class="form-control"
+             value="<%= content.about_title || '' %>" 
+             placeholder="About Jedi Medical">
+    </div>
+    
+    <div class="form-group">
+      <label>First Paragraph</label>
+      <textarea name="about_body1" class="form-control" rows="4"
+                placeholder="JediCare Medical centre is a Level 3 facility..."><%= content.about_body1 || '' %></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>Second Paragraph</label>
+      <textarea name="about_body2" class="form-control" rows="4"
+                placeholder="With EasyClinic helping streamline operations..."><%= content.about_body2 || '' %></textarea>
+    </div>
+  </div>
+  
+  <!-- Testimonials Section -->
+  <div class="admin-card">
+    <h2>💬 Testimonials</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <div class="form-group">
+        <label>Testimonial 1 Quote</label>
+        <textarea name="testimonial_quote1" class="form-control" rows="3"
+                  placeholder="The team at Jedi Medical listened..."><%= content.testimonial_quote1 || '' %></textarea>
+        <label style="margin-top: 12px;">Testimonial 1 Author</label>
+        <input type="text" name="testimonial_badge1" class="form-control"
+               value="<%= content.testimonial_badge1 || '' %>" 
+               placeholder="— Mary K., Kapsoya">
+      </div>
+      
+      <div class="form-group">
+        <label>Testimonial 2 Quote</label>
+        <textarea name="testimonial_quote2" class="form-control" rows="3"
+                  placeholder="Clean facility, modern equipment..."><%= content.testimonial_quote2 || '' %></textarea>
+        <label style="margin-top: 12px;">Testimonial 2 Author</label>
+        <input type="text" name="testimonial_badge2" class="form-control"
+               value="<%= content.testimonial_badge2 || '' %>" 
+               placeholder="— Daniel A., Ainabkoi">
+      </div>
+      
+      <div class="form-group">
+        <label>Testimonial 3 Quote</label>
+        <textarea name="testimonial_quote3" class="form-control" rows="3"
+                  placeholder="Fast diagnostics and practical advice..."><%= content.testimonial_quote3 || '' %></textarea>
+        <label style="margin-top: 12px;">Testimonial 3 Author</label>
+        <input type="text" name="testimonial_badge3" class="form-control"
+               value="<%= content.testimonial_badge3 || '' %>" 
+               placeholder="— Ruth N., Uasin Gishu">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>Tagline</label>
+      <input type="text" name="testimonials_tagline" class="form-control"
+             value="<%= content.testimonials_tagline || '' %>" 
+             placeholder="Testimonials slide automatically...">
+    </div>
+  </div>
+  
+  <!-- Contact Section -->
+  <div class="admin-card">
+    <h2>📞 Contact Section</h2>
+    
+    <div class="form-group">
+      <label>Section Title</label>
+      <input type="text" name="contact_title" class="form-control"
+             value="<%= content.contact_title || '' %>" 
+             placeholder="Book an Appointment">
+    </div>
+    
+    <div class="form-group">
+      <label>Introduction Text</label>
+      <textarea name="contact_intro" class="form-control" rows="4"
+                placeholder="Looking for a reliable private clinic..."><%= content.contact_intro || '' %></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>Note Text</label>
+      <input type="text" name="contact_note" class="form-control"
+             value="<%= content.contact_note || '' %>" 
+             placeholder="Prefer a call? Add your phone number...">
+    </div>
+  </div>
+  
+  <!-- Save Button -->
+  <div class="admin-card">
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button type="submit" class="btn btn-primary">💾 Save All Changes</button>
+      <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+  </div>
+</form>

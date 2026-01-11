@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Edit Blog Post' %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <div class="admin-nav">
+        <a href="/admin/dashboard" class="admin-brand">
+          <div class="admin-brand-logo">JM</div>
+          <div>
+            <div style="font-weight: 800;">JediCare Medical CMS</div>
+            <div style="font-size: 12px; color: #4d6b57;">Welcome, Admin</div>
+          </div>
+        </a>
+        
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="/" target="_blank" style="font-size: 14px; color: #23b371;">👁️ View Site</a>
+          <form method="post" action="/admin/logout" style="margin: 0;">
+            <button type="submit" class="button ghost" style="font-size: 14px;">Log out</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="admin-nav" style="margin-top: 10px;">
+        <ul class="admin-menu">
+          <li><a href="/admin/dashboard">📊 Dashboard</a></li>
+          <li><a href="/admin/content">📝 Edit Content</a></li>
+          <li><a href="/admin/section-images">🖼️ Section Images</a></li>
+          <li><a href="/admin/gallery">🖼️ Gallery</a></li>
+          <li><a href="/admin/blog" class="active">📚 Blog</a></li>
+        </ul>
+      </div>
+    </header>
+    
+    <main class="admin-main">
+      <div class="admin-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1>✏️ Edit Blog Post</h1>
+            <p>Update your blog post content.</p>
+          </div>
+          <a href="/admin/blog" class="btn btn-secondary">← Back to Blog</a>
+        </div>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="error-message" style="background: #fee; color: #c00; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+            ❌ <%= error %>
+          </div>
+        <% } %>
+        
+        <% if (typeof success !== 'undefined' && success) { %>
+          <div class="success-message" style="background: #efe; color: #090; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+            ✅ <%= success %>
+          </div>
+        <% } %>
+        
+        <form method="post" action="/admin/blog/update/<%= post.id %>" id="blogForm">
+          <div class="form-group">
+            <label class="form-label">Title *</label>
+            <input type="text" name="title" class="form-input" required value="<%= post.title %>" placeholder="Enter blog post title">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">URL Slug</label>
+            <input type="text" name="slug" class="form-input" id="slugInput" value="<%= post.slug %>" placeholder="Will be auto-generated from title">
+            <div class="slug-preview show" id="slugPreview">Preview: /blog/<span id="slugText"><%= post.slug %></span></div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Author *</label>
+            <input type="text" name="author" class="form-input" required value="<%= post.author %>" placeholder="Enter author name">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Excerpt (Short Description)</label>
+            <textarea name="excerpt" class="form-input" rows="3" placeholder="Brief summary of the post"><%= post.excerpt || '' %></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Content *</label>
+            <textarea name="content" class="form-input" rows="12" required placeholder="Write your blog post content here..."><%= post.content %></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Featured Image URL</label>
+            <input type="text" name="featured_image" class="form-input" value="<%= post.featured_image || '' %>" placeholder="https://example.com/image.jpg">
+            <p style="margin-top: 8px; font-size: 12px; color: #666;">You can upload images in the gallery section and copy the URL here.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <div style="display: flex; gap: 20px; margin-top: 8px;">
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" name="status" value="published" <%= post.status === 'published' ? 'checked' : '' %>>
+                <span>Published</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" name="status" value="draft" <%= post.status === 'draft' ? 'checked' : '' %>>
+                <span>Draft</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Post</button>
+            <a href="/admin/blog" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+        
+        <hr style="margin: 40px 0; border: 1px solid #e5eee7;">
+        
+        <div style="text-align: center;">
+          <h3 style="color: #dc2626; margin-bottom: 16px;">⚠️ Danger Zone</h3>
+          <p style="color: #666; margin-bottom: 20px;">Once you delete a blog post, there is no going back. Please be certain.</p>
+          <form method="post" action="/admin/blog/delete/<%= post.id %>" onsubmit="return confirm('Are you sure you want to delete this blog post? This action cannot be undone.');">
+            <button type="submit" class="btn" style="background: #dc2626; color: white;">Delete Post</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // Auto-generate slug from title
+    document.querySelector('input[name="title"]').addEventListener('input', function(e) {
+      const title = e.target.value;
+      const slugInput = document.getElementById('slugInput');
+      const slugPreview = document.getElementById('slugPreview');
+      const slugText = document.getElementById('slugText');
+      
+      if (title.trim()) {
+        // Generate slug: lowercase, replace spaces with hyphens, remove special chars
+        let slug = title.toLowerCase()
+          .replace(/[^\w\s-]/g, '') // Remove special characters
+          .replace(/\s+/g, '-')     // Replace spaces with hyphens
+          .replace(/--+/g, '-')     // Replace multiple hyphens with single
+          .trim();
+        
+        slugInput.value = slug;
+        slugText.textContent = slug;
+        slugPreview.classList.add('show');
+      } else {
+        slugInput.value = '';
+        slugPreview.classList.remove('show');
+      }
+    });
+    
+    // Allow manual slug editing
+    document.getElementById('slugInput').addEventListener('input', function(e) {
+      const slugPreview = document.getElementById('slugPreview');
+      const slugText = document.getElementById('slugText');
+      
+      if (e.target.value.trim()) {
+        slugText.textContent = e.target.value;
+        slugPreview.classList.add('show');
+      } else {
+        slugPreview.classList.remove('show');
+      }
+    });
+    
+    // Form submission
+    document.getElementById('blogForm').addEventListener('submit', function(e) {
+      // Ensure slug is properly formatted
+      const slugInput = document.getElementById('slugInput');
+      if (!slugInput.value.trim()) {
+        // Auto-generate from title if empty
+        const title = document.querySelector('input[name="title"]').value;
+        if (title.trim()) {
+          let slug = title.toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/--+/g, '-')
+            .trim();
+          slugInput.value = slug;
+        }
+      }
+    });
+  </script>
+  
+  <style>
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #0d1b12;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e5eee7;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #23b371;
+      box-shadow: 0 0 0 3px rgba(35, 179, 113, 0.1);
+    }
+    
+    textarea.form-input {
+      min-height: 120px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5eee7;
+    }
+    
+    .slug-preview {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 14px;
+      color: #666;
+      display: none;
+    }
+    
+    .slug-preview.show {
+      display: block;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    .btn-primary {
+      background: #23b371;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #1a9b5f;
+    }
+    
+    .btn-secondary {
+      background: #f6fbf7;
+      color: #0d1b12;
+      border: 1px solid #e5eee7;
+    }
+    
+    .btn-secondary:hover {
+      background: #e5eee7;
+    }
+  </style>
+</body>
+</html>

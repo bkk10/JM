@@ -1,0 +1,98 @@
+<!-- views/about.ejs -->
+<section class="section container">
+  <div class="about-hero">
+    <div class="about-hero-content">
+      <h2><%= content.about_title || 'About JediCare  Medical' %></h2>
+      <p><%= content.about_body1 || 'JediCare Care Medical centre is a Level 3 clinic recognized for precise, patient-centered care. We serve the Kapsoya ward in Ainabkoi constituency, Uasin Gishu, with an experienced team and a calm, well-kept facility. Our approach blends practical medicine with modern diagnostics—so you feel informed and supported at every step.' %></p>
+      <p><%= content.about_body2 || 'With EasyClinic helping streamline operations, we stay focused on what matters most: your care, your comfort, and dependable outcomes.' %></p>
+    </div>
+    <div class="about-hero-image">
+      <% 
+        // Get hero image for about page
+        const aboutHeroImage = imagesBySection && imagesBySection['about-hero'] && imagesBySection['about-hero'][0];
+      %>
+      <% if (aboutHeroImage) { %>
+        <img src="/uploads/<%= aboutHeroImage.filename %>" alt="<%= aboutHeroImage.caption || 'JediCare Care Medical centre' %>" style="width: 100%; height: 300px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+      <% } else { %>
+        <!-- Fallback to placeholder -->
+        <img src="https://via.placeholder.com/600x300/23b371/ffffff?text=JediCare +Medical+Centre" alt="JediCare Care Medical centre" style="width: 100%; height: 300px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+      <% } %>
+    </div>
+  </div>
+  
+  <div class="about-cards">
+    <div class="about-card">
+      <div class="about-card-icon">🏥</div>
+      <h3>Level 3 Facility</h3>
+      <p>Fully certified Level 3 medical center with comprehensive diagnostic and treatment capabilities for your healthcare needs.</p>
+    </div>
+    
+    <div class="about-card">
+      <div class="about-card-icon">👨‍⚕️</div>
+      <h3>Experienced Team</h3>
+      <p>Our dedicated healthcare professionals bring years of experience and expertise to ensure you receive the best possible care.</p>
+    </div>
+    
+    <div class="about-card">
+      <div class="about-card-icon">🔬</div>
+      <h3>Modern Diagnostics</h3>
+      <p>State-of-the-art medical equipment and diagnostic tools for accurate and timely health assessments.</p>
+    </div>
+    
+    <div class="about-card">
+      <div class="about-card-icon">👓</div>
+      <h3>In-House Optician</h3>
+      <p>Complete eye care services including vision testing, prescription glasses, and stylish frames all under one roof.</p>
+    </div>
+  </div>
+  
+  <div class="about-features">
+    <!-- Feature 1 -->
+    <div class="about-feature">
+      <div class="about-feature-image">
+        <% 
+          const featureImage1 = imagesBySection && imagesBySection['about-feature1'] && imagesBySection['about-feature1'][0];
+        %>
+        <% if (featureImage1) { %>
+          <img src="/uploads/<%= featureImage1.filename %>" alt="<%= featureImage1.caption || 'Our Medical Team' %>" style="width: 100%; height: 250px; object-fit: cover; border-radius: 12px;">
+        <% } else { %>
+          <img src="https://via.placeholder.com/500x250/23b371/ffffff?text=Our+Medical+Team" alt="Our Medical Team" style="width: 100%; height: 250px; object-fit: cover; border-radius: 12px;">
+        <% } %>
+      </div>
+      <div class="about-feature-content">
+        <h3>Our Commitment to Excellence</h3>
+        <p>At JediCare Care Medical centre, we're committed to providing exceptional healthcare services that prioritize your well-being. Our team works tirelessly to ensure every patient receives personalized attention and the highest standard of medical care.</p>
+        <ul>
+          <li>Patient-centered approach</li>
+          <li>Modern medical facilities</li>
+          <li>Experienced healthcare professionals</li>
+          <li>Comprehensive diagnostic services</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Feature 2 (Reversed) -->
+    <div class="about-feature reverse">
+      <div class="about-feature-image">
+        <% 
+          const featureImage2 = imagesBySection && imagesBySection['about-feature2'] && imagesBySection['about-feature2'][0];
+        %>
+        <% if (featureImage2) { %>
+          <img src="/uploads/<%= featureImage2.filename %>" alt="<%= featureImage2.caption || 'Community Healthcare' %>" style="width: 100%; height: 250px; object-fit: cover; border-radius: 12px;">
+        <% } else { %>
+          <img src="https://via.placeholder.com/500x250/23b371/ffffff?text=Community+Healthcare" alt="Community Healthcare" style="width: 100%; height: 250px; object-fit: cover; border-radius: 12px;">
+        <% } %>
+      </div>
+      <div class="about-feature-content">
+        <h3>Community Focused Care</h3>
+        <p>Located in the heart of Kapsoya, we're proud to serve our local community with accessible, affordable, and quality healthcare. We understand the unique health needs of our community and tailor our services accordingly.</p>
+        <ul>
+          <li>Serving Kapsoya ward and surrounding areas</li>
+          <li>Affordable healthcare solutions</li>
+          <li>Community health programs</li>
+          <li>Emergency care services</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

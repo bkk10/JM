@@ -1,0 +1,115 @@
+<!-- views/blog-post.ejs -->
+<style>
+  .blog-post-hero {
+    background: linear-gradient(135deg, #23b371, #1a9b5f);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  .blog-post-hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+  }
+  
+  .blog-post-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 16px;
+    opacity: 0.9;
+  }
+  
+  .blog-post-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  .blog-post-content {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e5eee7;
+  }
+  
+  .blog-post-body {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #0d1b12;
+  }
+  
+  .blog-post-body p {
+    margin-bottom: 20px;
+  }
+  
+  .blog-post-body h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 32px 0 16px 0;
+    color: #0d1b12;
+  }
+  
+  .blog-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid #e5eee7;
+  }
+  
+  .blog-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #23b371;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 768px) {
+    .blog-post-hero h1 {
+      font-size: 32px;
+    }
+    
+    .blog-post-meta {
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+    }
+    
+    .blog-post-content {
+      padding: 24px;
+    }
+  }
+</style>
+
+<section class="blog-post-hero">
+  <div class="container">
+    <h1><%= post.title %></h1>
+    <div class="blog-post-meta">
+      <span>📅 <%= new Date(post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+      <span>✍️ <%= post.author %></span>
+    </div>
+  </div>
+</section>
+
+<section class="blog-post-container">
+  <div class="blog-post-content">
+    <div class="blog-post-body">
+      <%- post.content.replace(/\n/g, '<br>') %>
+    </div>
+    
+    <div class="blog-navigation">
+      <a href="/blog" class="blog-back-link">
+        ← Back to Blog
+      </a>
+      <a href="/" class="button">Return to Home</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> - Jedi Medical Admin</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f6fbf7;
+      color: #0d1b12;
+      line-height: 1.6;
+    }
+    
+    .admin-container {
+      min-height: 100vh;
+      background: #f6fbf7;
+    }
+    
+    .admin-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5eee7;
+      padding: 14px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .admin-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #0d1b12;
+    }
+    
+    .admin-brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #23b371, #a7f3c6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #06381f;
+      font-size: 14px;
+    }
+    
+    .admin-menu {
+      display: flex;
+      gap: 16px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .admin-menu a {
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: #0d1b12;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .admin-menu a:hover,
+    .admin-menu a.active {
+      background: #a7f3c6;
+      color: #06381f;
+    }
+    
+    .admin-main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    
+    .admin-card {
+      background: #ffffff;
+      border: 1px solid #e5eee7;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .admin-card h1 {
+      margin: 0 0 16px 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: #0d1b12;
+    }
+    
+    .admin-card p {
+      margin: 0 0 16px 0;
+      color: #426b54;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .btn-admin {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    .btn-admin.btn-primary {
+      background: #23b371;
+      color: white;
+    }
+    
+    .btn-admin.btn-primary:hover {
+      background: #1a9b5f;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(35, 179, 113, 0.3);
+    }
+    
+    .btn-admin.btn-secondary {
+      background: #f6fbf7;
+      color: #0d1b12;
+      border: 1px solid #e5eee7;
+    }
+    
+    .btn-admin.btn-secondary:hover {
+      background: #e5eee7;
+      border-color: #d6f5e4;
+    }
+    
+    .button {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      background: #23b371;
+      color: white;
+    }
+    
+    .button:hover {
+      background: #1a9b5f;
+      transform: translateY(-1px);
+    }
+    
+    .button.ghost {
+      background: transparent;
+      color: #0d1b12;
+      border: 1px solid #e5eee7;
+    }
+    
+    .button.ghost:hover {
+      background: #f6fbf7;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #0d1b12;
+      font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #e5eee7;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #ffffff;
+      transition: all 0.2s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #23b371;
+      box-shadow: 0 0 0 3px rgba(35, 179, 113, 0.1);
+    }
+    
+    .form-group textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #e5eee7;
+    }
+    
+    .character-count {
+      font-size: 12px;
+      color: #4d6b57;
+      margin-top: 4px;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <div class="admin-nav">
+        <a href="/admin/dashboard" class="admin-brand">
+          <div class="admin-brand-logo">JM</div>
+          <div>
+            <div style="font-weight: 800;">Jedi Medical CMS</div>
+            <div style="font-size: 12px; color: #4d6b57;">Welcome, Admin</div>
+          </div>
+        </a>
+        
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="/" target="_blank" style="font-size: 14px; color: #23b371;">👁️ View Site</a>
+          <form method="post" action="/admin/logout" style="margin: 0;">
+            <button type="submit" class="button ghost" style="font-size: 14px;">Log out</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="admin-nav" style="margin-top: 10px;">
+        <ul class="admin-menu">
+          <li><a href="/admin/dashboard">📊 Dashboard</a></li>
+          <li><a href="/admin/content">📝 Edit Content</a></li>
+          <li><a href="/admin/visual">🎨 Visual Editor</a></li>
+          <li><a href="/admin/gallery">🖼️ Gallery</a></li>
+          <li><a href="/admin/blog" class="active">📚 Blog</a></li>
+        </ul>
+      </div>
+    </header>
+    
+    <main class="admin-main">
+      <div class="admin-card">
+        <h1><%= title %></h1>
+        <p>Fill in the details below to create or update your blog post.</p>
+        
+        <form method="post" action="<%= action %>">
+          <div class="form-group">
+            <label for="title">Post Title *</label>
+            <input type="text" id="title" name="title" value="<%= post.title || '' %>" required placeholder="Enter a compelling title for your blog post">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="author">Author</label>
+              <input type="text" id="author" name="author" value="<%= post.author || 'Admin' %>" placeholder="Author name">
+            </div>
+            
+            <div class="form-group">
+              <label for="status">Status</label>
+              <select id="status" name="status">
+                <option value="published" <%= post.status === 'published' ? 'selected' : '' %>>Published</option>
+                <option value="draft" <%= post.status === 'draft' ? 'selected' : '' %>>Draft</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="excerpt">Excerpt</label>
+            <textarea id="excerpt" name="excerpt" placeholder="A brief summary of your blog post (optional)"><%= post.excerpt || '' %></textarea>
+            <div class="character-count">Brief summary that will appear in blog listings</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="content">Content *</label>
+            <textarea id="content" name="content" required placeholder="Write your full blog post content here..."><%= post.content || '' %></textarea>
+            <div class="character-count">Use paragraphs, headings, and formatting to make your content readable</div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn-admin btn-primary">Save Post</button>
+            <a href="/admin/blog" class="btn-admin btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

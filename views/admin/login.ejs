@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - JediCare Care Medical centre</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="/">
+        <div class="brand-logo">JM</div>
+        <h1>JediCare  Medical</h1>
+      </a>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/admin/login" class="active">Admin</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+<section class="section" style="max-width:480px;margin:40px auto;">
+  <h2>Admin Login</h2>
+  <% if (error) { %><div class="card" style="border-left:3px solid #e66;margin:10px 0;"><%= error %></div><% } %>
+  <form method="post" action="/admin/login">
+    <input class="input" type="password" name="password" placeholder="Admin password" required />
+    <div style="margin-top:10px"><button class="button" type="submit">Sign in</button></div>
+  </form>
+  <div style="margin-top:20px; text-align:center;">
+    <a href="/" style="color:var(--accent); text-decoration:none;">← Back to Website</a>
+  </div>
+</section>
+  </main>
+
+  <footer class="footer container">
+    <div>© <%= new Date().getFullYear() %> JediCare Care Medical centre · Level 3 · Kapsoya, Ainabkoi · Uasin Gishu</div>
+  </footer>
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<div class="admin-card">
+  <h1>🖼️ Section Images Management</h1>
+  <p>Upload and manage images for different sections of your website.</p>
+</div>
+
+<div class="admin-card">
+  <h2>📤 Upload New Image</h2>
+  
+  <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
+      <div class="form-group">
+        <label>Section</label>
+        <select name="section" class="form-control" required>
+          <option value="">Select a section...</option>
+          <option value="hero">🏠 Hero Section</option>
+          <option value="about">📋 About Section</option>
+          <option value="about-hero">📋 About Page Hero</option>
+          <option value="about-feature1">📋 About Feature 1</option>
+          <option value="about-feature2">📋 About Feature 2</option>
+          <option value="services">🩺 Services Section</option>
+          <option value="service-general">🩺 General Consultations</option>
+          <option value="service-diagnostics">🩺 Diagnostics</option>
+          <option value="service-treatment">🩺 Treatment & Follow-up</option>
+          <option value="service-preventive">🩺 Preventive Care</option>
+          <option value="service-optician">🩺 Optician Services</option>
+          <option value="service-community">🩺 Community-Focused Care</option>
+          <option value="contact">📞 Contact Section</option>
+          <option value="contact-appointment">📞 Appointment Image</option>
+          <option value="contact-location">📞 Location/Map Image</option>
+          <option value="blog">📚 Blog Section</option>
+          <option value="blog-featured">📚 Featured Blog Image</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Image File *</label>
+        <input type="file" name="image" class="form-control" accept="image/*" required>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>Caption (Optional)</label>
+      <input type="text" name="caption" class="form-control" placeholder="Describe the image...">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">📤 Upload Image</button>
+  </form>
+</div>
+
+<!-- Current Images -->
+<div class="admin-card">
+  <h2>📁 Current Images</h2>
+  
+  <% if (imagesBySection && Object.keys(imagesBySection).length > 0) { %>
+    <% Object.keys(imagesBySection).forEach(function(section) { %>
+      <% if (imagesBySection[section] && imagesBySection[section].length > 0) { %>
+        <div style="margin-bottom: 32px; padding: 20px; background: #f6fbf7; border-radius: 12px; border: 1px solid #e5eee7;">
+          <h3 style="margin: 0 0 16px 0; color: #0d1b12; display: flex; align-items: center; gap: 8px;">
+            <% if (section === 'hero') { %>🏠 Hero Section<% } %>
+            <% if (section === 'about') { %>📋 About Section<% } %>
+            <% if (section === 'about-hero') { %>📋 About Page Hero<% } %>
+            <% if (section === 'about-feature1') { %>📋 About Feature 1<% } %>
+            <% if (section === 'about-feature2') { %>📋 About Feature 2<% } %>
+            <% if (section === 'services') { %>🩺 Services Section<% } %>
+            <% if (section === 'service-general') { %>🩺 General Consultations<% } %>
+            <% if (section === 'service-diagnostics') { %>🩺 Diagnostics<% } %>
+            <% if (section === 'service-treatment') { %>🩺 Treatment & Follow-up<% } %>
+            <% if (section === 'service-preventive') { %>🩺 Preventive Care<% } %>
+            <% if (section === 'service-optician') { %>🩺 Optician Services<% } %>
+            <% if (section === 'service-community') { %>🩺 Community-Focused Care<% } %>
+            <% if (section === 'contact') { %>📞 Contact Section<% } %>
+            <% if (section === 'contact-appointment') { %>📞 Appointment Image<% } %>
+            <% if (section === 'contact-location') { %>📞 Location/Map Image<% } %>
+            <% if (section === 'blog') { %>📚 Blog Section<% } %>
+            <% if (section === 'blog-featured') { %>📚 Featured Blog Image<% } %>
+            <span style="background: #23b371; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+              <%= imagesBySection[section].length %> image(s)
+            </span>
+          </h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+            <% imagesBySection[section].forEach(function(image) { %>
+              <div style="background: white; border: 1px solid #e5eee7; border-radius: 8px; overflow: hidden;">
+                <div style="width: 100%; height: 120px; overflow: hidden;">
+                  <img src="/uploads/<%= image.filename %>" alt="<%= image.caption || 'Section image' %>" 
+                       style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                
+                <div style="padding: 12px;">
+                  <div style="font-size: 12px; color: #426b54; margin-bottom: 8px; word-break: break-word;">
+                    <%= image.filename %>
+                  </div>
+                  
+                  <form method="post" action="/admin/section-images/update/<%= image.id %>" style="margin-bottom: 8px;">
+                    <input type="text" name="caption" value="<%= image.caption || '' %>" 
+                           placeholder="Add caption" class="form-control" style="font-size: 12px; padding: 6px;">
+                    <button type="submit" class="btn btn-sm btn-secondary" style="width: 100%; margin-top: 4px;">Update</button>
+                  </form>
+                  
+                  <form method="post" action="/admin/section-images/delete/<%= image.id %>" 
+                        onsubmit="return confirm('Delete this image?');">
+                    <button type="submit" class="btn btn-sm btn-danger" style="width: 100%;">🗑️ Delete</button>
+                  </form>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      <% } %>
+    <% }); %>
+  <% } else { %>
+    <div style="text-align: center; padding: 40px; color: #4d6b57; background: #f6fbf7; border-radius: 12px; border: 1px dashed #e5eee7;">
+      <div style="font-size: 24px; margin-bottom: 16px;">📷</div>
+      <h3 style="margin: 0 0 8px 0;">No images uploaded yet</h3>
+      <p style="margin: 0 0 20px 0;">Upload your first image above to get started.</p>
+    </div>
+  <% } %>
+</div>
+
+<style>
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #0d1b12;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e5eee7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #23b371;
+  box-shadow: 0 0 0 3px rgba(35, 179, 113, 0.1);
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+</style>

@@ -1,0 +1,234 @@
+<!-- views/admin/dashboard.ejs - SIMPLIFIED -->
+ <!-- views/admin/dashboard.ejs -->
+<style>
+  .admin-card {
+    background: #ffffff;
+    border: 1px solid #e5eee7;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .admin-card h1 {
+    margin: 0 0 16px 0;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0d1b12;
+  }
+  
+  .admin-card h2 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0d1b12;
+  }
+  
+  .admin-card p {
+    margin: 0 0 16px 0;
+    color: #426b54;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+  }
+  
+  .admin-stat-card {
+    background: #ffffff;
+    border: 1px solid #e5eee7;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .admin-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .admin-stat-card h3 {
+    margin: 8px 0;
+    font-size: 32px;
+    font-weight: 800;
+    color: #23b371;
+  }
+  
+  .admin-stat-card p {
+    margin: 4px 0 12px 0;
+    color: #4d6b57;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .btn-admin {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .btn-admin.btn-primary {
+    background: #23b371;
+    color: white;
+  }
+  
+  .btn-admin.btn-primary:hover {
+    background: #1a9b5f;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(35, 179, 113, 0.3);
+  }
+  
+  .btn-admin.btn-secondary {
+    background: #f6fbf7;
+    color: #0d1b12;
+    border: 1px solid #e5eee7;
+  }
+  
+  .btn-admin.btn-secondary:hover {
+    background: #e5eee7;
+    border-color: #d6f5e4;
+  }
+  
+  .btn-admin.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+</style>
+
+<div class="admin-card">
+  <h1>Dashboard</h1>
+  <!-- ... rest of your dashboard content ... -->
+</div>
+<div class="admin-card">
+  <h1>Dashboard</h1>
+  <p>Welcome to Jedi Medical CMS. Manage your website content from here.</p>
+  
+  <div class="admin-grid">
+    <div class="admin-stat-card">
+      <div style="font-size: 24px;">🩺</div>
+      <h3><%= counts.services || 6 %></h3>
+      <p>Active Services</p>
+      <a href="/admin/content" class="btn-admin btn-secondary btn-small">Edit</a>
+    </div>
+    
+    <div class="admin-stat-card">
+      <div style="font-size: 24px;">📰</div>
+      <h3><%= counts.posts || 0 %></h3>
+      <p>Blog Posts</p>
+      <a href="/admin/blog" class="btn-admin btn-secondary btn-small">Manage</a>
+       </div>
+    
+    <div class="admin-stat-card">
+      <div style="font-size: 24px;">🖼️</div>
+      <h3><%= counts.images || 0 %></h3>
+      <p>Gallery Images</p>
+      <a href="/admin/gallery" class="btn-admin btn-secondary btn-small">Manage</a>
+    </div>
+    
+    <div class="admin-stat-card">
+      <div style="font-size: 24px;">👥</div>
+      <h3>0</h3>
+      <p>Team Members</p>
+      <a href="#" class="btn-admin btn-secondary btn-small">Coming Soon</a>
+    </div>
+  </div>
+</div>
+
+<div class="admin-card">
+  <h2>Quick Actions</h2>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0;">
+    <a href="/admin/content" class="btn-admin btn-primary"> Edit Content</a>
+    <a href="/admin/section-images" class="btn-admin btn-primary"> Manage Hero Image</a>
+    <a href="/admin/gallery" class="btn-admin btn-primary"> Manage Gallery</a>
+    <a href="/" target="_blank" class="btn-admin btn-primary"> View Website</a>
+  </div>
+</div>
+<!-- Add this to your dashboard.ejs after the "Quick Actions" section -->
+
+<div class="admin-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>🏠 Hero Section Management</h2>
+    <a href="/admin/section-images" class="btn-admin btn-primary">Manage All Section Images</a>
+  </div>
+  
+  <p>Manage the main banner image that appears at the top of your homepage.</p>
+  
+  <div style="background: #f6fbf7; border: 1px solid #e5eee7; border-radius: 12px; padding: 20px; margin: 20px 0;">
+    <h3 style="margin: 0 0 16px 0; font-size: 16px;">Current Hero Image</h3>
+    
+    <% 
+      // Get hero images from recentImages or need to pass heroImages specifically
+      // For now, let's assume we need to add heroImages to the dashboard data
+    %>
+    
+    <% if (heroImages && heroImages.length > 0) { %>
+      <div style="display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: center;">
+        <div>
+          <img src="/uploads/<%= heroImages[0].filename %>" alt="<%= heroImages[0].caption || 'Current hero image' %>" 
+               style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;">
+        </div>
+        <div>
+          <p style="margin: 0 0 8px 0;"><strong>Filename:</strong> <%= heroImages[0].filename %></p>
+          <p style="margin: 0 0 8px 0;"><strong>Caption:</strong> <%= heroImages[0].caption || 'No caption' %></p>
+          <p style="margin: 0 0 12px 0;"><strong>Uploaded:</strong> <%= new Date(heroImages[0].created_at).toLocaleDateString() %></p>
+          <div style="display: flex; gap: 8px;">
+            <a href="/admin/section-images" class="btn-admin btn-secondary btn-sm">Change Image</a>
+            <form method="post" action="/admin/section-images/delete/<%= heroImages[0].id %>" 
+                  onsubmit="return confirm('Delete this hero image?');" style="margin: 0;">
+              <button type="submit" class="btn-admin btn-danger btn-sm">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% } else { %>
+      <div style="text-align: center; padding: 20px; color: #4d6b57;">
+        <p style="margin: 0 0 16px 0;">No hero image uploaded yet.</p>
+        <a href="/admin/section-images" class="btn-admin btn-primary">Upload Hero Image</a>
+      </div>
+    <% } %>
+  </div>
+  
+  <div style="margin-top: 20px;">
+    <h3 style="font-size: 16px; margin-bottom: 12px;">Quick Upload</h3>
+    <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data" 
+          style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+      <input type="hidden" name="section" value="hero">
+      <div>
+        <label style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600;">Image Caption (Optional)</label>
+        <input type="text" name="caption" class="inline-edit" placeholder="Describe your hero image...">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600;">Choose Image</label>
+        <input type="file" name="image" class="inline-edit" accept="image/*" required>
+      </div>
+      <button type="submit" class="btn-admin btn-primary">Upload</button>
+    </form>
+  </div>
+</div>
+
+<% if (recentImages && recentImages.length > 0) { %>
+<div class="admin-card">
+  <h2>Recent Gallery Images</h2>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 20px 0;">
+    <% recentImages.forEach(image => { %>
+      <div style="text-align: center;">
+        <img src="/uploads/<%= image.filename %>" alt="<%= image.caption %>" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px;">
+        <p style="font-size: 12px; margin-top: 5px;"><%= image.caption || 'No caption' %></p>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<% } %>

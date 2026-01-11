@@ -1,0 +1,398 @@
+<!-- Hero Section -->
+<section id="home" style="padding: 60px 0;">
+  <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:36px;align-items:center;max-width:1200px;margin:0 auto;padding:0 20px;">
+    <div>
+      <div style="color:#23b371;font-weight:600;margin-bottom:8px;">
+        <%= (content && content.hero_kicker) || 'Level 3 • Kapsoya, Ainabkoi · Uasin Gishu' %>
+      </div>
+      <h2 style="font-size:42px;line-height:1.1;margin:0 0 14px;font-weight:800;">
+        <%= (content && content.hero_title) || 'Healthcare that feels personal—delivered with precision.' %>
+      </h2>
+      <p style="color:#426b54;font-size:16px;">
+        <%= (content && content.hero_intro) || 'Jedi Medical Centre is a trusted Level 3 clinic serving families and professionals in Kapsoya. We combine experienced clinicians with modern diagnostics and patient-first service. Our optician desk helps you see better—with frames you will love.' %>
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;">
+        <div style="background:#eff9f3;border:1px solid #e0e6e3;padding:10px;border-radius:12px;color:#1f5136;font-size:13px;">
+          <%= (content && content.hero_badge1) || 'Open and fully operational' %>
+        </div>
+        <div style="background:#eff9f3;border:1px solid #e0e6e3;padding:10px;border-radius:12px;color:#1f5136;font-size:13px;">
+          <%= (content && content.hero_badge2) || 'Modern diagnostics & imaging' %>
+        </div>
+        <div style="background:#eff9f3;border:1px solid #e0e6e3;padding:10px;border-radius:12px;color:#1f5136;font-size:13px;">
+          <%= (content && content.hero_badge3) || 'Optician services & prescription glasses' %>
+        </div>
+        <div style="background:#eff9f3;border:1px solid #e0e6e3;padding:10px;border-radius:12px;color:#1f5136;font-size:13px;">
+          <%= (content && content.hero_badge4) || 'Powered by EasyClinic operations' %>
+        </div>
+      </div>
+      <div style="margin-top: 30px;">
+        <a href="#contact" style="background:#23b371;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;">Book Appointment</a>
+        <a href="#services" style="background:transparent;color:#23b371;padding:12px 24px;border-radius:8px;text-decoration:none;border:2px solid #23b371;margin-left:15px;display:inline-block;">Our Services</a>
+      </div>
+    </div>
+    <div>
+      <% 
+        const heroImages = imagesBySection && imagesBySection['hero'];
+        const heroImage = heroImages && heroImages[0];
+      %>
+      <% if (heroImage) { %>
+        <img src="/uploads/<%= heroImage.filename %>" 
+             alt="<%= heroImage.caption || 'Jedi Medical Centre' %>" 
+             style="width:100%;height:500px;object-fit:cover;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=600&fit=crop&crop=center" 
+             alt="Jedi Medical Centre" 
+             style="width:100%;height:500px;object-fit:cover;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="section">
+  <h2>Healthcare Services</h2>
+  <div class="cards">
+    <!-- Service 1: General Consultations -->
+    <div class="card">
+      <% 
+        const serviceImage1 = imagesBySection && imagesBySection['service-general'] && imagesBySection['service-general'][0];
+      %>
+      <% if (serviceImage1) { %>
+        <img src="/uploads/<%= serviceImage1.filename %>" alt="<%= serviceImage1.caption || 'Doctor consultation' %>" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1551601651-2a8553c1627f?w=400&h=200&fit=crop&crop=center" alt="Doctor consultation" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } %>
+      <h3>General Consultations</h3>
+      <p>Assessment and treatment for everyday concerns with clear next steps.</p>
+    </div>
+    
+    <!-- Service 2: Diagnostics -->
+    <div class="card">
+      <% 
+        const serviceImage2 = imagesBySection && imagesBySection['service-diagnostics'] && imagesBySection['service-diagnostics'][0];
+      %>
+      <% if (serviceImage2) { %>
+        <img src="/uploads/<%= serviceImage2.filename %>" alt="<%= serviceImage2.caption || 'Medical diagnostics' %>" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=200&fit=crop&crop=center" alt="Medical diagnostics" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } %>
+      <h3>Diagnostics</h3>
+      <p>Laboratory tests and imaging to support accurate, timely diagnoses.</p>
+    </div>
+    
+    <!-- Service 3: Treatment & Follow-up -->
+    <div class="card">
+      <% 
+        const serviceImage3 = imagesBySection && imagesBySection['service-treatment'] && imagesBySection['service-treatment'][0];
+      %>
+      <% if (serviceImage3) { %>
+        <img src="/uploads/<%= serviceImage3.filename %>" alt="<%= serviceImage3.caption || 'Medical treatment' %>" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d50c118?w=400&h=200&fit=crop&crop=center" alt="Medical treatment" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } %>
+      <h3>Treatment & Follow‑up</h3>
+      <p>Evidence-based treatments and attentive follow-up for recovery and continuity.</p>
+    </div>
+    
+    <!-- Service 4: Preventive Care -->
+    <div class="card">
+      <% 
+        const serviceImage4 = imagesBySection && imagesBySection['service-preventive'] && imagesBySection['service-preventive'][0];
+      %>
+      <% if (serviceImage4) { %>
+        <img src="/uploads/<%= serviceImage4.filename %>" alt="<%= serviceImage4.caption || 'Preventive care' %>" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1576201836106-db1758a1c16b?w=400&h=200&fit=crop&crop=center" alt="Preventive care" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } %>
+      <h3>Preventive Care</h3>
+      <p>Vaccinations, screenings, and wellness checks to keep you ahead of issues.</p>
+    </div>
+    
+    <!-- Service 5: Optician Services -->
+    <div class="card">
+      <% 
+        const serviceImage5 = imagesBySection && imagesBySection['service-optician'] && imagesBySection['service-optician'][0];
+      %>
+      <% if (serviceImage5) { %>
+        <img src="/uploads/<%= serviceImage5.filename %>" alt="<%= serviceImage5.caption || 'Eye examination' %>" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1515238152731-9603b8a548c7?w=400&h=200&fit=crop&crop=center" alt="Eye examination" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } %>
+      <h3>Optician Services</h3>
+      <p>Comprehensive eye exams, prescriptions, and <strong>glasses sales</strong> with curated frames.</p>
+    </div>
+    
+    <!-- Service 6: Community-Focused Care -->
+    <div class="card">
+      <% 
+        const serviceImage6 = imagesBySection && imagesBySection['service-community'] && imagesBySection['service-community'][0];
+      %>
+      <% if (serviceImage6) { %>
+        <img src="/uploads/<%= serviceImage6.filename %>" alt="<%= serviceImage6.caption || 'Community healthcare' %>" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=200&fit=crop&crop=center" alt="Community healthcare" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+      <% } %>
+      <h3>Community-Focused Care</h3>
+      <p>Accessible care for Kapsoya and greater Uasin Gishu—reliable and close to home.</p>
+    </div>
+  </div>
+  <div style="margin-top:10px" class="badge">Jedi Medical Centre is Level 3 and fully operational.</div>
+  <div style="margin-top:10px" class="badge">Serving Kapsoya ward, Ainabkoi constituency · Uasin Gishu</div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section id="why-choose-us" class="section">
+  <h2><%= (content && content.why_title) || 'Why patients choose Jedi' %></h2>
+  <div class="cards">
+    <div class="card">
+      <h3><%= (content && content.why_card1_title) || 'Experienced Team' %></h3>
+      <p><%= (content && content.why_card1_body) || 'Clinicians with broad hands-on experience, focused on practical, effective care.' %></p>
+    </div>
+    <div class="card">
+      <h3><%= (content && content.why_card2_title) || 'Modern Equipment' %></h3>
+      <p><%= (content && content.why_card2_body) || 'From labs to imaging, we invest in tools that improve accuracy and outcomes.' %></p>
+    </div>
+    <div class="card">
+      <h3><%= (content && content.why_card3_title) || 'Clean & Safe' %></h3>
+      <p><%= (content && content.why_card3_body) || 'Strict hygiene protocols for a calm, safe environment at every visit.' %></p>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="section">
+  <h2><%= (content && content.about_title) || 'About Jedi Medical' %></h2>
+  <p><%= (content && content.about_body1) || 'Jedi Medical Centre is a Level 3 clinic recognized for precise, patient-centered care. We serve the Kapsoya ward in Ainabkoi constituency, Uasin Gishu, with an experienced team and a calm, well-kept facility. Our approach blends practical medicine with modern diagnostics—so you feel informed and supported at every step.' %></p>
+  <p><%= (content && content.about_body2) || 'With EasyClinic helping streamline operations, we stay focused on what matters most: your care, your comfort, and dependable outcomes.' %></p>
+</section>
+
+<!-- Blog Preview Section -->
+<section id="blog-preview" class="section">
+  <h2>Latest Medical Insights</h2>
+  <div class="cards">
+    <% if (blogPosts && blogPosts.length > 0) { %>
+      <% blogPosts.forEach(post => { %>
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=200&fit=crop&crop=center" alt="<%= post.title %>" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+          <h3><%= post.title %></h3>
+          <p><%= post.excerpt || post.content.substring(0, 100) + '...' %></p><br>
+          <a href="/blog/<%= post.slug %>" class="button" style="margin-top:10px;font-size:14px;padding:8px 12px;"> Read More</a>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <!-- Default blog previews -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=200&fit=crop&crop=center" alt="Preventive healthcare" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+        <h3>5 Essential Preventive Health Checks</h3>
+        <p>Discover key health screenings for early detection and better health.</p>
+        <a href="/blog" class="button" style="margin-top:10px;font-size:14px;padding:8px 12px;">Read More</a>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=200&fit=crop&crop=center" alt="Eye care" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+        <h3>Protecting Your Vision</h3>
+        <p>Learn strategies to reduce digital eye strain and maintain healthy vision.</p>
+        <a href="/blog" class="button" style="margin-top:10px;font-size:14px;padding:8px 12px;">Read More</a>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400&h=200&fit=crop&crop=center" alt="Child health" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+        <h3>Children's Health Foundation</h3>
+        <p>Essential healthcare tips for children's development and wellbeing.</p>
+        <a href="/blog" class="button" style="margin-top:10px;font-size:14px;padding:8px 12px;">Read More</a>
+      </div>
+    <% } %>
+  </div>
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="/blog" class="button">View All Blog Posts</a>
+  </div>
+</section>
+
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="section">
+  <h2>What Our Patients Say</h2>
+  
+  <% if (content && content.testimonials_tagline) { %>
+    <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 14px;">
+      <%= content.testimonials_tagline %>
+    </p>
+  <% } %>
+  
+  <div class="testimonials-container" style="max-width: 800px; margin: 0 auto; position: relative; overflow: hidden;">
+    <div class="testimonials-slider" style="display: flex; transition: transform 0.5s ease;">
+      <% 
+        // Create an array of testimonials from content
+        const testimonials = [];
+        
+        // Check each testimonial slot
+        for (let i = 1; i <= 3; i++) {
+          const quote = content && content[`testimonial_quote${i}`];
+          const badge = content && content[`testimonial_badge${i}`];
+          
+          if (quote && quote.trim()) {
+            testimonials.push({ quote, badge });
+          }
+        }
+        
+        // If no testimonials in content, use default
+        if (testimonials.length === 0) {
+          testimonials.push({
+            quote: "The team at Jedi Medical listened carefully, explained everything clearly, and helped me feel at ease throughout my visit. Professional and compassionate care.",
+            badge: "— Mary K., Kapsoya"
+          });
+          testimonials.push({
+            quote: "Clean facility, modern equipment, and doctors who take time to understand. The optician helped me find perfect glasses. Highly recommended!",
+            badge: "— Daniel A., Ainabkoi"
+          });
+          testimonials.push({
+            quote: "Fast diagnostics and practical advice. I appreciate how they follow up to ensure recovery is on track. A reliable clinic in our community.",
+            badge: "— Ruth N., Uasin Gishu"
+          });
+        }
+      %>
+      
+      <% testimonials.forEach((testimonial, index) => { %>
+        <div class="testimonial-slide" 
+             style="min-width: 100%; padding: 30px; background: #f9f9f9; border-radius: 12px; box-sizing: border-box;">
+          <div style="font-size: 24px; color: #23b371; margin-bottom: 16px; text-align: center;">"</div>
+          <p style="font-size: 18px; font-style: italic; color: #426b54; text-align: center;">
+            <%= testimonial.quote %>
+          </p>
+          <div style="text-align: center; margin-top: 20px;">
+            <div class="badge"><%= testimonial.badge %></div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    
+    <% if (testimonials.length > 1) { %>
+      <!-- Navigation dots -->
+      <div style="text-align: center; margin-top: 20px;">
+        <% for (let i = 0; i < testimonials.length; i++) { %>
+          <button class="testimonial-dot" 
+                  data-index="<%= i %>" 
+                  style="width: 10px; height: 10px; border-radius: 50%; border: none; background: <%= i === 0 ? '#23b371' : '#ccc' %>; margin: 0 5px; cursor: pointer;"></button>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<style>
+  .testimonial-slide {
+    transition: opacity 0.5s ease;
+  }
+</style>
+
+<script>
+  // Auto-scrolling testimonials
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.querySelector('.testimonials-slider');
+    const dots = document.querySelectorAll('.testimonial-dot');
+    const slides = document.querySelectorAll('.testimonial-slide');
+    
+    if (slides.length > 1) {
+      let currentIndex = 0;
+      const totalSlides = slides.length;
+      
+      // Function to move to a specific slide
+      function goToSlide(index) {
+        currentIndex = index;
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+        
+        // Update active dot
+        dots.forEach((dot, i) => {
+          dot.style.background = i === currentIndex ? '#23b371' : '#ccc';
+        });
+      }
+      
+      // Auto-scroll every 5 seconds
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        goToSlide(currentIndex);
+      }, 5000);
+      
+      // Dot click events
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+        });
+      });
+    }
+  });
+</script>
+<!-- Gallery Preview Section -->
+<section id="gallery-preview" class="section">
+  <h2>Clinic Gallery</h2>
+  <% if (galleryImages && galleryImages.length > 0) { %>
+    <div class="gallery">
+      <% galleryImages.slice(0, 6).forEach(image => { %>
+        <img src="/uploads/<%= image.filename %>" alt="<%= image.caption || 'JediCare Medical centre' %>" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="gallery">
+      <img src="https://images.unsplash.com/photo-1551601651-2a8553c1627f?w=300&h=200&fit=crop" alt="Clinic" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+      <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=300&h=200&fit=crop" alt="Equipment" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+      <img src="https://images.unsplash.com/photo-1515238152731-9603b8a548c7?w=300&h=200&fit=crop" alt="Optician" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+      <img src="https://images.unsplash.com/photo-1579684385127-1ef15d50c118?w=300&h=200&fit=crop" alt="Treatment" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+      <img src="https://images.unsplash.com/photo-1576201836106-db1758a1c16b?w=300&h=200&fit=crop" alt="Preventive care" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+      <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=300&h=200&fit=crop" alt="Community" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+    </div>
+  <% } %>
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="/gallery" class="button">View Full Gallery</a>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="section">
+  <h2><%= (content && content.contact_title) || 'Book an Appointment' %></h2>
+  <p><%= (content && content.contact_intro) || 'Looking for a reliable private clinic near you in Uasin Gishu? Jedi Medical Centre is open and ready to help. Reach out and our team will guide you to the right service, including our in-house optician desk for prescriptions and glasses.' %></p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start;margin-top:30px;">
+    <div>
+      <form action="/contact" method="post">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <input class="input" type="text" name="name" placeholder="Your name" required />
+          <input class="input" type="email" name="email" placeholder="Email" required />
+        </div>
+        <div style="margin-top:10px">
+          <input class="input" type="text" name="phone" placeholder="Phone number" />
+        </div>
+        <div style="margin-top:10px">
+          <textarea class="input" name="message" placeholder="How can we help?" rows="5" required></textarea>
+        </div>
+        <div style="margin-top:12px">
+          <button class="button" type="submit">Send inquiry</button>
+        </div>
+      </form>
+      
+      <p style="margin-top:14px;color:#666;font-size:14px;">
+        <%= (content && content.contact_note) || 'Prefer a call? Add your phone number—we will get back promptly.' %>
+      </p>
+    </div>
+    <div>
+      <% 
+        const appointmentImages = imagesBySection && imagesBySection['contact-appointment'];
+        const appointmentImage = appointmentImages && appointmentImages[0];
+      %>
+      <% if (appointmentImage) { %>
+        <img src="/uploads/<%= appointmentImage.filename %>" alt="<%= appointmentImage.caption || 'Medical appointment booking' %>" style="width:100%;height:300px;object-fit:cover;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+      <% } else { %>
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop&crop=center" alt="Medical appointment booking" style="width:100%;height:auto;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+      <% } %>
+      <div style="margin-top:16px;padding:20px;background:#f0fbf5;border-radius:12px;border:1px solid #e5eee7;">
+        <h4 style="margin:0 0 10px 0;color:#0d1b12;">Quick Contact</h4>
+        <p style="margin:5px 0;font-size:14px;"><strong>Phone:</strong> +254 XXX XXX XXX</p>
+        <p style="margin:5px 0;font-size:14px;"><strong>Email:</strong> info@jedimedical.co.ke</p>
+        <p style="margin:5px 0;font-size:14px;"><strong>Hours:</strong> Mon-Fri 8AM-6PM, Sat 9AM-2PM</p>
+        <p style="margin:5px 0;font-size:14px;"><strong>Location:</strong> Kapsoya, Uasin Gishu</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Back to Top Button -->
+<div style="text-align: center; margin: 40px 0;">
+  <a href="#home" class="button ghost">Back to Top</a>
+</div>

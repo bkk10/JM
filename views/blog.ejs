@@ -1,0 +1,203 @@
+<!-- views/blog.ejs -->
+<style>
+  .blog-hero {
+    background: linear-gradient(135deg, #0d1b12 0%, #1a3d2e 100%);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .blog-hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  
+  .blog-hero p {
+    font-size: 18px;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .blog-posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+  }
+  
+  .blog-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e5eee7;
+    transition: all 0.3s ease;
+  }
+  
+  .blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  }
+  
+  .blog-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .blog-card-content {
+    padding: 30px;
+  }
+  
+  .blog-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0d1b12;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  
+  .blog-card-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .blog-card-title a:hover {
+    color: #23b371;
+  }
+  
+  .blog-card-excerpt {
+    font-size: 14px;
+    color: #426b54;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  .blog-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .blog-card-author {
+    font-weight: 600;
+    color: #0d1b12;
+  }
+  
+  .blog-card-date {
+    opacity: 0.8;
+  }
+  
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #23b371;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  
+  .read-more:hover {
+    gap: 8px;
+  }
+  
+  .no-posts {
+    text-align: center;
+    padding: 60px 20px;
+    color: #4d6b57;
+  }
+  
+  .no-posts h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #0d1b12;
+  }
+  
+  .no-posts p {
+    font-size: 16px;
+    max-width: 500px;
+    margin: 0 auto 24px;
+  }
+  
+  @media (max-width: 768px) {
+    .blog-posts {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .blog-hero h1 {
+      font-size: 32px;
+    }
+    
+    .blog-hero p {
+      font-size: 16px;
+    }
+  }
+</style>
+
+<section class="blog-hero">
+  <div class="container">
+    <h1>📚 JediCare  Medical Blog</h1>
+    <p>Health tips, medical insights, and updates from our team of healthcare professionals</p>
+  </div>
+</section>
+
+<section class="section container">
+  <% if (posts && posts.length > 0) { %>
+    <div class="blog-posts">
+      <% posts.forEach((post, index) => { %>
+        <div class="blog-card">
+          <!-- Blog post image -->
+          <% 
+            const blogImages = imagesBySection && imagesBySection['blog-featured'];
+            const blogImage = blogImages && blogImages[index];
+          %>
+          <% if (blogImage) { %>
+            <img src="/uploads/<%= blogImage.filename %>" alt="<%= blogImage.caption || post.title %>" class="blog-card-image">
+          <% } else { %>
+            <!-- Use different placeholder based on index -->
+            <% 
+              const placeholderImages = [
+                'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=200&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=200&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400&h=200&fit=crop&crop=center'
+              ];
+              const placeholderIndex = index % placeholderImages.length;
+            %>
+            <img src="<%= placeholderImages[placeholderIndex] %>" alt="<%= post.title %>" class="blog-card-image">
+          <% } %>
+          
+          <div class="blog-card-content">
+            <h3 class="blog-card-title">
+              <a href="/blog/<%= post.slug %>"><%= post.title %></a>
+            </h3>
+            <% if (post.excerpt) { %>
+              <p class="blog-card-excerpt"><%= post.excerpt %></p>
+            <% } else { %>
+              <p class="blog-card-excerpt"><%= post.content.substring(0, 150) %>...</p>
+            <% } %>
+            <div class="blog-card-meta">
+              <span class="blog-card-author"> <%= post.author %></span>
+              <span class="blog-card-date">📅 <%= new Date(post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            </div>
+            <a href="/blog/<%= post.slug %>" class="read-more">Read more →</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="no-posts">
+      <h3>No blog posts yet</h3>
+      <p>We're working on creating valuable health content for you. Check back soon!</p>
+      <p>In the meantime, explore our <a href="/services">services</a> or <a href="/contact">contact us</a> with any questions.</p>
+    </div>
+  <% } %>
+</section>

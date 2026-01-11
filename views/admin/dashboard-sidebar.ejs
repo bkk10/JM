@@ -1,0 +1,162 @@
+<!-- Dashboard Content for Sidebar Layout -->
+<div class="admin-card">
+  <h1>Welcome to Jedi Medical CMS</h1>
+  <p>Manage your website content, images, and blog posts from this dashboard.</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">🩺</div>
+    <div class="stat-number"><%= counts.services || 6 %></div>
+    <div class="stat-label">Active Services</div>
+    <a href="/admin/content" class="btn btn-secondary btn-sm">Edit</a>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon">📰</div>
+    <div class="stat-number"><%= counts.posts || 0 %></div>
+    <div class="stat-label">Blog Posts</div>
+    <a href="/admin/blog" class="btn btn-secondary btn-sm">Manage</a>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon">🖼️</div>
+    <div class="stat-number"><%= counts.images || 0 %></div>
+    <div class="stat-label">Gallery Images</div>
+    <a href="/admin/gallery" class="btn btn-secondary btn-sm">Manage</a>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon">👥</div>
+    <div class="stat-number"><%= counts.visits || 0 %></div>
+    <div class="stat-label">Total Visits</div>
+    <div class="stat-today">Today: <%= counts.todayVisits || 0 %></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon">📧</div>
+    <div class="stat-number"><%= counts.contacts || 0 %></div>
+    <div class="stat-label">Contact Messages</div>
+    <a href="/admin/content" class="btn btn-secondary btn-sm">View</a>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon">🏠</div>
+    <div class="stat-number"><%= heroImages ? heroImages.length : 0 %></div>
+    <div class="stat-label">Hero Images</div>
+    <a href="/admin/section-images" class="btn btn-secondary btn-sm">Manage</a>
+  </div>
+</div>
+
+<!-- Hero Image Status -->
+<div class="admin-card">
+  <h2>🏠 Hero Image Status</h2>
+  <% if (heroImages && heroImages.length > 0) { %>
+    <div style="background: #f0fdf4; border: 1px solid #d1fae5; border-radius: 8px; padding: 16px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <img src="/uploads/<%= heroImages[0].filename %>" 
+             alt="Current hero image" 
+             style="width: 100px; height: 60px; object-fit: cover; border-radius: 6px;">
+        <div>
+          <p style="margin: 0 0 8px 0; color: #166534;">
+            ✅ Hero image is active
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <a href="/admin/section-images" class="btn btn-secondary btn-sm">Change</a>
+            <a href="/" target="_blank" class="btn btn-secondary btn-sm">Preview</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } else { %>
+    <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; text-align: center;">
+      <p style="margin: 0 0 12px 0; color: #92400e;">
+        ⚠️ No hero image uploaded
+      </p>
+      <a href="/admin/section-images" class="btn btn-primary">Upload Hero Image</a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Quick Actions -->
+<div class="admin-card">
+  <h2>Quick Actions</h2>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px;">
+    <a href="/admin/content" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+      📝 Edit Content
+    </a>
+    <a href="/admin/section-images" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+      🏠 Manage Images
+    </a>
+    <a href="/admin/blog/new" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+      ✏️ New Blog Post
+    </a>
+    <a href="/" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+      👁️ View Site
+    </a>
+  </div>
+</div>
+
+<% if (recentImages && recentImages.length > 0) { %>
+<div class="admin-card">
+  <h2>Recent Gallery Images</h2>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px;">
+    <% recentImages.forEach(image => { %>
+      <div style="text-align: center;">
+        <img src="/uploads/<%= image.filename %>" 
+             alt="<%= image.caption %>" 
+             style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px;">
+        <p style="font-size: 12px; margin-top: 5px; color: #4d6b57;">
+          <%= image.caption || 'No caption' %>
+        </p>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<% } %>
+
+<!-- Analytics Section -->
+<div class="admin-card">
+  <h2>📊 Analytics Overview</h2>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+    <!-- Recent Contact Submissions -->
+    <div>
+      <h3 style="font-size: 16px; margin-bottom: 12px; color: #0d1b12;">📧 Recent Messages</h3>
+      <% if (recentContacts && recentContacts.length > 0) { %>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <% recentContacts.forEach(contact => { %>
+            <div style="background: #f6fbf7; padding: 10px; border-radius: 6px; border-left: 3px solid #23b371;">
+              <div style="font-weight: 600; font-size: 14px; color: #0d1b12;"><%= contact.name %></div>
+              <div style="font-size: 12px; color: #4d6b57;"><%= contact.email %></div>
+              <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+                <%= new Date(contact.submission_date).toLocaleDateString() %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p style="color: #6b7280; font-size: 14px;">No contact submissions yet</p>
+      <% } %>
+    </div>
+    
+    <!-- Popular Pages -->
+    <div>
+      <h3 style="font-size: 16px; margin-bottom: 12px; color: #0d1b12;">🔥 Popular Pages</h3>
+      <% if (popularPages && popularPages.length > 0) { %>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <% popularPages.forEach(page => { %>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f6fbf7; padding: 8px 12px; border-radius: 6px;">
+              <span style="font-size: 14px; color: #0d1b12;"><%= page.page_visited %></span>
+              <span style="background: #23b371; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                <%= page.visits %> visits
+              </span>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p style="color: #6b7280; font-size: 14px;">No page visits tracked yet</p>
+      <% } %>
+    </div>
+  </div>
+</div>

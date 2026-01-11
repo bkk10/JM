@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Manager - JediCare Care Medical centre</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="/">
+        <div class="brand-logo">JM</div>
+        <h1>JediCare  Medical</h1>
+      </a>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/admin/gallery" class="active">Admin</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+<section class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <h2>Image Manager</h2>
+      <a href="/admin/content" class="badge">Edit site text</a>
+    </div>
+    <form method="post" action="/admin/logout">
+      <button class="button ghost" type="submit">Log out</button>
+    </form>
+  </div>
+
+  <div class="card" style="margin:12px 0;">
+    <form method="post" action="/admin/upload" enctype="multipart/form-data" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input class="input" type="file" name="image" accept="image/*" required />
+      <input class="input" type="text" name="caption" placeholder="Caption (optional)" />
+      <button class="button" type="submit">Upload</button>
+    </form>
+  </div>
+
+  <div class="gallery">
+    <% if ((images||[]).length === 0){ %>
+      <p style="color:#9fb3d9">No images yet.</p>
+    <% } %>
+    <% (images||[]).forEach(img => { %>
+      <div class="card" style="padding:8px">
+        <img src="/uploads/<%= img.filename %>" alt="Image <%= img.id %>" style="width:100%;height:180px;object-fit:cover;border-radius:8px"/>
+        <form method="post" action="/admin/update/<%= img.id %>" style="margin-top:8px">
+          <input class="input" type="text" name="caption" value="<%= img.caption || '' %>" placeholder="Caption" />
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="button" type="submit">Save</button>
+            <button class="button ghost" form="delete-<%= img.id %>" onclick="return confirm('Delete this image?')">Delete</button>
+          </div>
+        </form>
+        <form id="delete-<%= img.id %>" method="post" action="/admin/delete/<%= img.id %>"></form>
+      </div>
+    <% }) %>
+  </div>
+</section>
+  </main>
+
+  <footer class="footer container">
+    <div>© <%= new Date().getFullYear() %> JediCare Care Medical centre · Level 3 · Kapsoya, Ainabkoi · Uasin Gishu</div>
+  </footer>
+  <script src="/js/main.js"></script>
+</body>
+</html>

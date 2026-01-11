@@ -1,0 +1,538 @@
+<!-- views/admin/section-images.ejs -->
+<style>
+  .section-images-container {
+    display: grid;
+    gap: 30px;
+  }
+  
+  .section-card {
+    background: #ffffff;
+    border: 1px solid #e5eee7;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .section-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5eee7;
+  }
+  
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0d1b12;
+    margin: 0 0 8px 0;
+  }
+  
+  .section-header p {
+    font-size: 14px;
+    color: #426b54;
+    margin: 0;
+  }
+  
+  .upload-form {
+    background: #f6fbf7;
+    border: 2px dashed #e5eee7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .upload-form h3 {
+    font-size: 16px;
+    margin: 0 0 16px 0;
+    color: #0d1b12;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 12px;
+    align-items: end;
+  }
+  
+  .form-group {
+    margin-bottom: 0;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0d1b12;
+  }
+  
+  .images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .image-card {
+    background: #ffffff;
+    border: 1px solid #e5eee7;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  
+  .image-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .image-preview {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: #f6fbf7;
+  }
+  
+  .image-info {
+    padding: 12px;
+  }
+  
+  .image-caption {
+    font-size: 12px;
+    color: #426b54;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+  
+  .image-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .no-images {
+    text-align: center;
+    padding: 40px 20px;
+    color: #4d6b57;
+    background: #f6fbf7;
+    border-radius: 10px;
+    border: 1px dashed #e5eee7;
+  }
+  
+  .no-images p {
+    margin: 0 0 10px 0;
+  }
+  
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .images-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+  }
+</style>
+
+<div class="admin-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h1>🖼️ Section Images Management</h1>
+      <p>Upload and manage images for different sections of your website.</p>
+    </div>
+    <a href="/admin/dashboard" class="btn-admin btn-secondary">← Back to Dashboard</a>
+  </div>
+  
+  <% if (typeof success !== 'undefined') { %>
+    <div class="success-message">
+      ✅ Changes saved successfully!
+    </div>
+  <% } %>
+  
+  <% if (typeof error !== 'undefined') { %>
+    <div class="error-message">
+      ❌ Error: <%= error %>
+    </div>
+  <% } %>
+  
+  <div class="section-images-container">
+    
+    <!-- Hero Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>🏠 Hero Section (Homepage Banner)</h2>
+        <p>Main banner image that appears at the top of your homepage</p>
+      </div>
+      
+      <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data" class="upload-form">
+        <h3>Upload New Hero Image</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Section</label>
+            <select name="section" class="inline-edit" required>
+              <option value="hero">Hero Section</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Image Caption (Optional)</label>
+            <input type="text" name="caption" class="inline-edit" placeholder="Describe the image...">
+          </div>
+          <div class="form-group">
+            <label>Choose Image</label>
+            <input type="file" name="image" class="inline-edit" accept="image/*" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-admin btn-primary" style="margin-top: 12px;">Upload Image</button>
+      </form>
+      
+      <div class="section-images">
+        <h3 style="font-size: 16px; margin: 20px 0 12px 0;">Current Hero Images</h3>
+        <% if (imagesBySection['hero'] && imagesBySection['hero'].length > 0) { %>
+          <div class="images-grid">
+            <% imagesBySection['hero'].forEach(function(image) { %>
+              <div class="image-card">
+                <img src="/uploads/<%= image.filename %>" alt="<%= image.caption %>" class="image-preview">
+                <div class="image-info">
+                  <div class="image-caption"><%= image.caption || 'No caption' %></div>
+                  <div class="image-actions">
+                    <form method="post" action="/admin/section-images/update/<%= image.id %>" style="flex: 1;">
+                      <input type="text" name="caption" value="<%= image.caption %>" placeholder="Add caption" class="inline-edit" style="margin-bottom: 4px; font-size: 11px; padding: 4px;">
+                      <button type="submit" class="btn-admin btn-secondary btn-sm" style="width: 100%;">Update</button>
+                    </form>
+                    <form method="post" action="/admin/section-images/delete/<%= image.id %>" onsubmit="return confirm('Delete this image?');">
+                      <button type="submit" class="btn-admin btn-danger btn-sm">Delete</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="no-images">
+            <p>No hero images uploaded yet.</p>
+            <p class="small">Upload an image above to display in the hero section.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- About Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>📋 About Section</h2>
+        <p>Images for the about page and about section on homepage</p>
+      </div>
+      
+      <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data" class="upload-form">
+        <h3>Upload New About Image</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Section</label>
+            <select name="section" class="inline-edit" required>
+              <option value="about">About Section</option>
+              <option value="about-hero">About Page Hero</option>
+              <option value="about-feature1">About Feature 1</option>
+              <option value="about-feature2">About Feature 2</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Image Caption (Optional)</label>
+            <input type="text" name="caption" class="inline-edit" placeholder="Describe the image...">
+          </div>
+          <div class="form-group">
+            <label>Choose Image</label>
+            <input type="file" name="image" class="inline-edit" accept="image/*" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-admin btn-primary" style="margin-top: 12px;">Upload Image</button>
+      </form>
+      
+      <div class="section-images">
+        <h3 style="font-size: 16px; margin: 20px 0 12px 0;">Current About Images</h3>
+        <% 
+          const aboutSections = ['about', 'about-hero', 'about-feature1', 'about-feature2'];
+          let hasAboutImages = false;
+          
+          aboutSections.forEach(function(section) {
+            if (imagesBySection[section] && imagesBySection[section].length > 0) {
+              hasAboutImages = true;
+            }
+          });
+        %>
+        
+        <% if (hasAboutImages) { %>
+          <div class="images-grid">
+            <% aboutSections.forEach(function(section) { %>
+              <% if (imagesBySection[section]) { %>
+                <% imagesBySection[section].forEach(function(image) { %>
+                  <div class="image-card">
+                    <img src="/uploads/<%= image.filename %>" alt="<%= image.caption %>" class="image-preview">
+                    <div class="image-info">
+                      <div class="image-caption">
+                        <strong><%= section %>:</strong> <%= image.caption || 'No caption' %>
+                      </div>
+                      <div class="image-actions">
+                        <form method="post" action="/admin/section-images/update/<%= image.id %>" style="flex: 1;">
+                          <input type="text" name="caption" value="<%= image.caption %>" placeholder="Add caption" class="inline-edit" style="margin-bottom: 4px; font-size: 11px; padding: 4px;">
+                          <button type="submit" class="btn-admin btn-secondary btn-sm" style="width: 100%;">Update</button>
+                        </form>
+                        <form method="post" action="/admin/section-images/delete/<%= image.id %>" onsubmit="return confirm('Delete this image?');">
+                          <button type="submit" class="btn-admin btn-danger btn-sm">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } %>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="no-images">
+            <p>No about images uploaded yet.</p>
+            <p class="small">Upload images for different about sections above.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- Services Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>🩺 Services Section</h2>
+        <p>Images for services cards and services page</p>
+      </div>
+      
+      <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data" class="upload-form">
+        <h3>Upload New Services Image</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Section</label>
+            <select name="section" class="inline-edit" required>
+              <option value="services">Services Section</option>
+              <option value="service-general">General Consultations</option>
+              <option value="service-diagnostics">Diagnostics</option>
+              <option value="service-treatment">Treatment & Follow-up</option>
+              <option value="service-preventive">Preventive Care</option>
+              <option value="service-optician">Optician Services</option>
+              <option value="service-community">Community-Focused Care</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Image Caption (Optional)</label>
+            <input type="text" name="caption" class="inline-edit" placeholder="Describe the image...">
+          </div>
+          <div class="form-group">
+            <label>Choose Image</label>
+            <input type="file" name="image" class="inline-edit" accept="image/*" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-admin btn-primary" style="margin-top: 12px;">Upload Image</button>
+      </form>
+      
+      <div class="section-images">
+        <h3 style="font-size: 16px; margin: 20px 0 12px 0;">Current Services Images</h3>
+        <% 
+          const serviceSections = ['services', 'service-general', 'service-diagnostics', 'service-treatment', 
+                                   'service-preventive', 'service-optician', 'service-community'];
+          let hasServiceImages = false;
+          
+          serviceSections.forEach(function(section) {
+            if (imagesBySection[section] && imagesBySection[section].length > 0) {
+              hasServiceImages = true;
+            }
+          });
+        %>
+        
+        <% if (hasServiceImages) { %>
+          <div class="images-grid">
+            <% serviceSections.forEach(function(section) { %>
+              <% if (imagesBySection[section]) { %>
+                <% imagesBySection[section].forEach(function(image) { %>
+                  <div class="image-card">
+                    <img src="/uploads/<%= image.filename %>" alt="<%= image.caption %>" class="image-preview">
+                    <div class="image-info">
+                      <div class="image-caption">
+                        <strong><%= section %>:</strong> <%= image.caption || 'No caption' %>
+                      </div>
+                      <div class="image-actions">
+                        <form method="post" action="/admin/section-images/update/<%= image.id %>" style="flex: 1;">
+                          <input type="text" name="caption" value="<%= image.caption %>" placeholder="Add caption" class="inline-edit" style="margin-bottom: 4px; font-size: 11px; padding: 4px;">
+                          <button type="submit" class="btn-admin btn-secondary btn-sm" style="width: 100%;">Update</button>
+                        </form>
+                        <form method="post" action="/admin/section-images/delete/<%= image.id %>" onsubmit="return confirm('Delete this image?');">
+                          <button type="submit" class="btn-admin btn-danger btn-sm">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } %>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="no-images">
+            <p>No services images uploaded yet.</p>
+            <p class="small">Upload images for different services above.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- Contact/Appointment Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>📞 Contact/Appointment Section</h2>
+        <p>Images for contact page and appointment booking section</p>
+      </div>
+      
+      <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data" class="upload-form">
+        <h3>Upload New Contact Image</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Section</label>
+            <select name="section" class="inline-edit" required>
+              <option value="contact">Contact Section</option>
+              <option value="contact-appointment">Appointment Image</option>
+              <option value="contact-location">Location/Map Image</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Image Caption (Optional)</label>
+            <input type="text" name="caption" class="inline-edit" placeholder="Describe the image...">
+          </div>
+          <div class="form-group">
+            <label>Choose Image</label>
+            <input type="file" name="image" class="inline-edit" accept="image/*" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-admin btn-primary" style="margin-top: 12px;">Upload Image</button>
+      </form>
+      
+      <div class="section-images">
+        <h3 style="font-size: 16px; margin: 20px 0 12px 0;">Current Contact Images</h3>
+        <% 
+          const contactSections = ['contact', 'contact-appointment', 'contact-location'];
+          let hasContactImages = false;
+          
+          contactSections.forEach(function(section) {
+            if (imagesBySection[section] && imagesBySection[section].length > 0) {
+              hasContactImages = true;
+            }
+          });
+        %>
+        
+        <% if (hasContactImages) { %>
+          <div class="images-grid">
+            <% contactSections.forEach(function(section) { %>
+              <% if (imagesBySection[section]) { %>
+                <% imagesBySection[section].forEach(function(image) { %>
+                  <div class="image-card">
+                    <img src="/uploads/<%= image.filename %>" alt="<%= image.caption %>" class="image-preview">
+                    <div class="image-info">
+                      <div class="image-caption">
+                        <strong><%= section %>:</strong> <%= image.caption || 'No caption' %>
+                      </div>
+                      <div class="image-actions">
+                        <form method="post" action="/admin/section-images/update/<%= image.id %>" style="flex: 1;">
+                          <input type="text" name="caption" value="<%= image.caption %>" placeholder="Add caption" class="inline-edit" style="margin-bottom: 4px; font-size: 11px; padding: 4px;">
+                          <button type="submit" class="btn-admin btn-secondary btn-sm" style="width: 100%;">Update</button>
+                        </form>
+                        <form method="post" action="/admin/section-images/delete/<%= image.id %>" onsubmit="return confirm('Delete this image?');">
+                          <button type="submit" class="btn-admin btn-danger btn-sm">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } %>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="no-images">
+            <p>No contact images uploaded yet.</p>
+            <p class="small">Upload images for contact sections above.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- Blog Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>📚 Blog Section</h2>
+        <p>Featured images for blog posts</p>
+      </div>
+      
+      <form method="post" action="/admin/section-images/upload" enctype="multipart/form-data" class="upload-form">
+        <h3>Upload New Blog Image</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Section</label>
+            <select name="section" class="inline-edit" required>
+              <option value="blog">Blog Section</option>
+              <option value="blog-featured">Featured Blog Image</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Image Caption (Optional)</label>
+            <input type="text" name="caption" class="inline-edit" placeholder="Describe the image...">
+          </div>
+          <div class="form-group">
+            <label>Choose Image</label>
+            <input type="file" name="image" class="inline-edit" accept="image/*" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-admin btn-primary" style="margin-top: 12px;">Upload Image</button>
+      </form>
+      
+      <div class="section-images">
+        <h3 style="font-size: 16px; margin: 20px 0 12px 0;">Current Blog Images</h3>
+        <% 
+          const blogSections = ['blog', 'blog-featured'];
+          let hasBlogImages = false;
+          
+          blogSections.forEach(function(section) {
+            if (imagesBySection[section] && imagesBySection[section].length > 0) {
+              hasBlogImages = true;
+            }
+          });
+        %>
+        
+        <% if (hasBlogImages) { %>
+          <div class="images-grid">
+            <% blogSections.forEach(function(section) { %>
+              <% if (imagesBySection[section]) { %>
+                <% imagesBySection[section].forEach(function(image) { %>
+                  <div class="image-card">
+                    <img src="/uploads/<%= image.filename %>" alt="<%= image.caption %>" class="image-preview">
+                    <div class="image-info">
+                      <div class="image-caption">
+                        <strong><%= section %>:</strong> <%= image.caption || 'No caption' %>
+                      </div>
+                      <div class="image-actions">
+                        <form method="post" action="/admin/section-images/update/<%= image.id %>" style="flex: 1;">
+                          <input type="text" name="caption" value="<%= image.caption %>" placeholder="Add caption" class="inline-edit" style="margin-bottom: 4px; font-size: 11px; padding: 4px;">
+                          <button type="submit" class="btn-admin btn-secondary btn-sm" style="width: 100%;">Update</button>
+                        </form>
+                        <form method="post" action="/admin/section-images/delete/<%= image.id %>" onsubmit="return confirm('Delete this image?');">
+                          <button type="submit" class="btn-admin btn-danger btn-sm">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } %>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="no-images">
+            <p>No blog images uploaded yet.</p>
+            <p class="small">Upload blog images above.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+  </div>
+</div>
