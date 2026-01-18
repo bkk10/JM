@@ -1,9 +1,10 @@
-// server.js - SINGLE PAGE WEBSITE VERSION
+// server.js - VERCEL COMPATIBLE VERSION
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const multer = require('multer');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const fs = require('fs');
 
 const app = express();
 
@@ -11,16 +12,48 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.use(expressLayouts);
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Serve static files BEFORE any other middleware
+app.use('/css', express.static(path.join(__dirname, 'public/css'), {
+  maxAge: '1y',
+  setHeaders: (res, path) => {
+    res.setHeader('Content-Type', 'text/css');
+  }
+}));
+
+app.use('/js', express.static(path.join(__dirname, 'public/js'), {
+  maxAge: '1y',
+  setHeaders: (res, path) => {
+    res.setHeader('Content-Type', 'application/javascript');
+  }
+}));
+
+app.use('/images', express.static(path.join(__dirname, 'public/images'), {
+  maxAge: '1y'
+}));
+
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
+  maxAge: '1y'
+}));
+
+// Also serve from root public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Simple session simulation
 let adminLoggedIn = false;
 
 // ==================== DATABASE ====================
-const db = new sqlite3.Database('./data/jedimedical.db');
+// For Vercel, use in-memory database or create DB file in /tmp
+const dbPath = process.env.VERCEL ? '/tmp/jedimedical.db' : './data/jedimedical.db';
 
+// Create data directory if it doesn't exist (for local)
+if (!process.env.VERCEL && !fs.existsSync('./data')) {
+  fs.mkdirSync('./data', { recursive: true });
+}
+
+const db = new sqlite3.Database(dbPath);
 // Initialize tables
 db.serialize(() => {
   // Content table
@@ -113,19 +146,56 @@ db.serialize(() => {
   for (const [key, value] of Object.entries(defaultContent)) {
     db.run(`INSERT OR IGNORE INTO content (key, value) VALUES (?, ?)`, [key, value]);
   }
+
+  // Default blog posts (for fresh deployments)
+  const defaultBlogPosts = [
+    {
+      title: 'Preventive healthcare',
+      slug: 'preventive-healthcare',
+      excerpt: '5 Essential Preventive Health Checks',
+      content: 'Discover key health screenings for early detection and better health. Regular preventive care is the foundation of long-term wellness and can catch potential health issues before they become serious problems.',
+      author: 'Admin',
+      status: 'published'
+    },
+    {
+      title: 'Eye care',
+      slug: 'eye-care',
+      excerpt: 'Protecting Your Vision',
+      content: 'Learn strategies to reduce digital eye strain and maintain healthy vision. In today\'s digital world, protecting your eyes is more important than ever. Our comprehensive eye care services help you maintain optimal vision health.',
+      author: 'Admin',
+      status: 'published'
+    },
+    {
+      title: 'Child health',
+      slug: 'child-health',
+      excerpt: 'Children\'s Health Foundation',
+      content: 'Essential healthcare tips for children\'s development and wellbeing. From vaccinations to growth monitoring, we provide comprehensive pediatric care to ensure your children grow up healthy and strong.',
+      author: 'Admin',
+      status: 'published'
+    }
+  ];
+
+  // Insert default blog posts if table is empty
+  db.get('SELECT COUNT(*) as count FROM blog_posts', (err, row) => {
+    if (!err && row.count === 0) {
+      defaultBlogPosts.forEach(post => {
+        db.run(`INSERT INTO blog_posts (title, slug, excerpt, content, author, status) VALUES (?, ?, ?, ?, ?, ?)`,
+          [post.title, post.slug, post.excerpt, post.content, post.author, post.status]);
+      });
+    }
+  });
 });
 
 app.locals.db = db;
 
 // ==================== FILE UPLOAD ====================
-const storage = multer.diskStorage({
-  destination: 'public/uploads/',
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+// VERCEL FIX: Use memory storage instead of disk storage
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   }
 });
-
-const upload = multer({ storage: storage });
 
 // ==================== SIMPLE AUTH ====================
 const ADMIN_PASSWORD = 'admin123';
@@ -137,7 +207,7 @@ const requireAuth = (req, res, next) => {
   res.redirect('/admin/login');
 };
 
-// Helper functions
+// Helper functions (keep your existing ones)
 function getAllContent() {
   return new Promise((resolve, reject) => {
     db.all('SELECT key, value FROM content', (err, rows) => {
@@ -148,6 +218,7 @@ function getAllContent() {
     });
   });
 }
+
 
 function getSectionImages() {
   return new Promise((resolve, reject) => {
@@ -171,27 +242,26 @@ function getSectionImages() {
 
 async function renderWithLayout(res, view, data = {}, layout = 'layout') {
   try {
-    // Add current year
     data.currentYear = new Date().getFullYear();
     
-    // Add section images to data if not already there
-    if (!data.imagesBySection) {
-      try {
-        data.imagesBySection = await getSectionImages();
-      } catch (error) {
-        console.error('Error loading section images:', error);
-        data.imagesBySection = {};
-      }
-    }
+    // Remove this duplicate footer logic if it exists
+    // Just render directly without nested rendering
     
-    // Render view with layout
-    res.render(view, data, (err, html) => {
+    res.render(view, { 
+      ...data, 
+      layout: false // IMPORTANT: Don't use express-ejs-layouts for main render
+    }, (err, html) => {
       if (err) {
         console.error('Render error:', err);
         return res.status(500).send('Render error');
       }
       
-      res.render(layout, { ...data, body: html });
+      // Now render with layout
+      res.render(layout, { 
+        ...data, 
+        body: html,
+        layout: false 
+      });
     });
   } catch (error) {
     console.error('Render with layout error:', error);
@@ -214,11 +284,11 @@ app.use((req, res, next) => {
   }
   next();
 });
-
 // ==================== PUBLIC ROUTES ====================
 
 // Home page (SINGLE PAGE with all sections)
 // Home page (SINGLE PAGE with all sections)
+// Home page - SIMPLIFIED
 app.get('/', async (req, res) => {
   try {
     const content = await getAllContent();
@@ -234,22 +304,24 @@ app.get('/', async (req, res) => {
       db.all('SELECT * FROM blog_posts WHERE status = "published" ORDER BY created_at DESC LIMIT 3',
         (err, rows) => resolve(rows || []));
     });
-    
-    console.log('Homepage blog posts loaded:', blogPosts.length, 'posts');
-    console.log('Homepage posts:', blogPosts);
 
-    // CHANGE THIS LINE: Use renderWithLayout instead of res.render
-    renderWithLayout(res, 'index', {
+    // Get section images for hero section
+    const imagesBySection = await getSectionImages();
+    
+    // DIRECT RENDER - no complex wrapper
+    res.render('index', {
       content,
       galleryImages,
       blogPosts,
-      active: 'home'
+      imagesBySection,
+      active: 'home',
     });
   } catch (error) {
     console.error('Home error:', error);
     res.status(500).send('Server error');
   }
 });
+
 // Gallery page
 app.get('/gallery', async (req, res) => {
   try {
@@ -279,9 +351,13 @@ app.get('/blog', async (req, res) => {
         (err, rows) => resolve(rows || []));
     });
     
+    // Get section images for blog featured images
+    const imagesBySection = await getSectionImages();
+    
     renderWithLayout(res, 'blog', {
       content,
       posts,
+      imagesBySection,
       active: 'blog'
     });
   } catch (error) {
