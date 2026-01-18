@@ -9,25 +9,38 @@
   "routes": [
     {
       "src": "/css/(.*)",
+      "dest": "server.js",
       "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     {
       "src": "/js/(.*)",
+      "dest": "server.js",
       "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "server.js",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     {
       "src": "/uploads/(.*)",
+      "dest": "server.js",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "server.js"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

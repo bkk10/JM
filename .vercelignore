@@ -1,0 +1,15 @@
+node_modules
+*.log
+.DS_Store
+.git
+.gitignore
+.vercel
+.idea
+.vscode
+*.md
+data/
+!data/.gitkeep
+.env
+*.db
+*.db-journal
+temp/

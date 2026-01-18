@@ -1,5 +1,5 @@
 {
-  "name": "JediCare -medical-site",
+  "name": "jedicare-medical-site",
   "version": "1.0.0",
   "description": "JediCare Care Medical centre website with admin image manager",
   "main": "server.js",
@@ -8,19 +8,17 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "dotenv": "^16.4.5",
+    "better-sqlite3": "^12.6.2",
     "ejs": "^3.1.10",
-    "ejs-mate": "^4.0.0",
     "express": "^4.22.1",
     "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.18.2",
-    "method-override": "^3.0.0",
-    "multer": "^1.4.5-lts.1",
-    "sqlite3": "^5.1.7"
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [],
   "author": "",

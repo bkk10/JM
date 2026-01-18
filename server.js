@@ -1,6 +1,6 @@
-// server.js - VERCEL COMPATIBLE VERSION
+﻿// server.js - VERCEL COMPATIBLE VERSION
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const multer = require('multer');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
@@ -15,7 +15,7 @@ app.use(expressLayouts);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static files BEFORE any other middleware
+// Serve static files
 app.use('/css', express.static(path.join(__dirname, 'public/css'), {
   maxAge: '1y',
   setHeaders: (res, path) => {
@@ -38,7 +38,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
   maxAge: '1y'
 }));
 
-// Also serve from root public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Simple session simulation
@@ -53,71 +52,66 @@ if (!process.env.VERCEL && !fs.existsSync('./data')) {
   fs.mkdirSync('./data', { recursive: true });
 }
 
-const db = new sqlite3.Database(dbPath);
+const db = new Database(dbPath);
+
 // Initialize tables
-db.serialize(() => {
-  // Content table
-  db.run(`CREATE TABLE IF NOT EXISTS gallery_images (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    filename TEXT NOT NULL,
-    caption TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+try {
+  // Create tables using exec with options object
+  const initSQL = `
+    CREATE TABLE IF NOT EXISTS gallery_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      filename TEXT NOT NULL,
+      caption TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 
-  // Blog posts table
-  db.run(`CREATE TABLE IF NOT EXISTS blog_posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    slug TEXT NOT NULL UNIQUE,
-    content TEXT NOT NULL,
-    excerpt TEXT,
-    author TEXT DEFAULT 'Admin',
-    status TEXT DEFAULT 'published',
-    featured_image TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      slug TEXT NOT NULL UNIQUE,
+      content TEXT NOT NULL,
+      excerpt TEXT,
+      author TEXT DEFAULT 'Admin',
+      status TEXT DEFAULT 'published',
+      featured_image TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 
-  // Add featured_image column if it doesn't exist
-  db.run(`ALTER TABLE blog_posts ADD COLUMN featured_image TEXT`, (err) => {
-    if (err && !err.message.includes('duplicate column name')) {
-      console.error('Error adding featured_image column:', err);
-    }
-  });
+    CREATE TABLE IF NOT EXISTS content (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    );
 
-  // Content table
-  db.run(`CREATE TABLE IF NOT EXISTS content (
-    key TEXT PRIMARY KEY,
-    value TEXT
-  )`);
+    CREATE TABLE IF NOT EXISTS section_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      section TEXT NOT NULL,
+      filename TEXT NOT NULL,
+      caption TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 
-  // Section images table
-  db.run(`CREATE TABLE IF NOT EXISTS section_images (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    section TEXT NOT NULL,
-    filename TEXT NOT NULL,
-    caption TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+    CREATE TABLE IF NOT EXISTS site_visits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ip_address TEXT,
+      user_agent TEXT,
+      page_visited TEXT,
+      referrer TEXT,
+      visit_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 
-  // Analytics tables
-  db.run(`CREATE TABLE IF NOT EXISTS site_visits (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ip_address TEXT,
-    user_agent TEXT,
-    page_visited TEXT,
-    referrer TEXT,
-    visit_date DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+    CREATE TABLE IF NOT EXISTS contact_submissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      email TEXT,
+      phone TEXT,
+      message TEXT,
+      submission_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
 
-  db.run(`CREATE TABLE IF NOT EXISTS contact_submissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT,
-    phone TEXT,
-    message TEXT,
-    submission_date DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+  // Execute all SQL statements
+  db.exec(initSQL);
 
   // Default content
   const defaultContent = {
@@ -143,9 +137,15 @@ db.serialize(() => {
     'contact_note': 'Prefer a call? Add your phone number—we will get back promptly.'
   };
 
-  for (const [key, value] of Object.entries(defaultContent)) {
-    db.run(`INSERT OR IGNORE INTO content (key, value) VALUES (?, ?)`, [key, value]);
-  }
+  // Insert default content
+  const insertStmt = db.prepare('INSERT OR IGNORE INTO content (key, value) VALUES (?, ?)');
+  const insertMany = db.transaction((items) => {
+    for (const [key, value] of Object.entries(items)) {
+      insertStmt.run(key, value);
+    }
+  });
+  
+  insertMany(defaultContent);
 
   // Default blog posts (for fresh deployments)
   const defaultBlogPosts = [
@@ -175,21 +175,39 @@ db.serialize(() => {
     }
   ];
 
-  // Insert default blog posts if table is empty
-  db.get('SELECT COUNT(*) as count FROM blog_posts', (err, row) => {
-    if (!err && row.count === 0) {
-      defaultBlogPosts.forEach(post => {
-        db.run(`INSERT INTO blog_posts (title, slug, excerpt, content, author, status) VALUES (?, ?, ?, ?, ?, ?)`,
-          [post.title, post.slug, post.excerpt, post.content, post.author, post.status]);
-      });
-    }
-  });
-});
+  // Check if blog posts table is empty
+  const countStmt = db.prepare('SELECT COUNT(*) as count FROM blog_posts');
+  const row = countStmt.get();
+  
+  if (row.count === 0) {
+    const insertPostStmt = db.prepare(
+      'INSERT INTO blog_posts (title, slug, excerpt, content, author, status) VALUES (?, ?, ?, ?, ?, ?)'
+    );
+    
+    const insertPosts = db.transaction((posts) => {
+      for (const post of posts) {
+        insertPostStmt.run(
+          post.title, 
+          post.slug, 
+          post.excerpt, 
+          post.content, 
+          post.author, 
+          post.status
+        );
+      }
+    });
+    
+    insertPosts(defaultBlogPosts);
+  }
 
-app.locals.db = db;
+  console.log('✅ Database initialized successfully');
+
+} catch (error) {
+  console.error('❌ Database initialization error:', error);
+  // Continue anyway - the app should still work without database
+}
 
 // ==================== FILE UPLOAD ====================
-// VERCEL FIX: Use memory storage instead of disk storage
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
@@ -207,65 +225,37 @@ const requireAuth = (req, res, next) => {
   res.redirect('/admin/login');
 };
 
-// Helper functions (keep your existing ones)
+// ==================== HELPER FUNCTIONS ====================
 function getAllContent() {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT key, value FROM content', (err, rows) => {
-      if (err) reject(err);
-      const content = {};
-      rows.forEach(row => content[row.key] = row.value);
-      resolve(content);
-    });
-  });
+  try {
+    const stmt = db.prepare('SELECT key, value FROM content');
+    const rows = stmt.all();
+    const content = {};
+    rows.forEach(row => content[row.key] = row.value);
+    return content;
+  } catch (error) {
+    console.error('Error getting content:', error);
+    return {};
+  }
 }
-
 
 function getSectionImages() {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM section_images ORDER BY section, created_at DESC',
-      (err, rows) => {
-        if (err) reject(err);
-        
-        // Group by section
-        const imagesBySection = {};
-        rows.forEach(img => {
-          if (!imagesBySection[img.section]) {
-            imagesBySection[img.section] = [];
-          }
-          imagesBySection[img.section].push(img);
-        });
-        
-        resolve(imagesBySection);
-      });
-  });
-}
-
-async function renderWithLayout(res, view, data = {}, layout = 'layout') {
   try {
-    data.currentYear = new Date().getFullYear();
+    const stmt = db.prepare('SELECT * FROM section_images ORDER BY section, created_at DESC');
+    const rows = stmt.all();
     
-    // Remove this duplicate footer logic if it exists
-    // Just render directly without nested rendering
-    
-    res.render(view, { 
-      ...data, 
-      layout: false // IMPORTANT: Don't use express-ejs-layouts for main render
-    }, (err, html) => {
-      if (err) {
-        console.error('Render error:', err);
-        return res.status(500).send('Render error');
+    const imagesBySection = {};
+    rows.forEach(img => {
+      if (!imagesBySection[img.section]) {
+        imagesBySection[img.section] = [];
       }
-      
-      // Now render with layout
-      res.render(layout, { 
-        ...data, 
-        body: html,
-        layout: false 
-      });
+      imagesBySection[img.section].push(img);
     });
+    
+    return imagesBySection;
   } catch (error) {
-    console.error('Render with layout error:', error);
-    res.status(500).send('Server error');
+    console.error('Error getting section images:', error);
+    return {};
   }
 }
 
@@ -275,40 +265,36 @@ app.use((req, res, next) => {
       !req.path.startsWith('/js') && !req.path.startsWith('/uploads')) {
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
     
-    db.run(`INSERT INTO site_visits (ip_address, user_agent, page_visited, referrer) VALUES (?, ?, ?, ?)`, [
+    // FIXED: Use synchronous better-sqlite3 syntax
+    const stmt = db.prepare('INSERT INTO site_visits (ip_address, user_agent, page_visited, referrer) VALUES (?, ?, ?, ?)');
+    stmt.run(
       clientIP,
       req.headers['user-agent'] || '',
       req.path,
       req.headers['referer'] || ''
-    ]);
+    );
   }
   next();
 });
+
 // ==================== PUBLIC ROUTES ====================
 
-// Home page (SINGLE PAGE with all sections)
-// Home page (SINGLE PAGE with all sections)
-// Home page - SIMPLIFIED
-app.get('/', async (req, res) => {
+// Home page
+app.get('/', (req, res) => {
   try {
-    const content = await getAllContent();
+    const content = getAllContent();
     
     // Get gallery images for preview
-    const galleryImages = await new Promise(resolve => {
-      db.all('SELECT * FROM gallery_images ORDER BY created_at DESC LIMIT 6',
-        (err, rows) => resolve(rows || []));
-    });
+    const galleryStmt = db.prepare('SELECT * FROM gallery_images ORDER BY created_at DESC LIMIT 6');
+    const galleryImages = galleryStmt.all();
 
-    // Get blog posts for preview
-    const blogPosts = await new Promise(resolve => {
-      db.all('SELECT * FROM blog_posts WHERE status = "published" ORDER BY created_at DESC LIMIT 3',
-        (err, rows) => resolve(rows || []));
-    });
+    // Get blog posts for preview - FIXED: Use single quotes for string literal
+    const blogStmt = db.prepare("SELECT * FROM blog_posts WHERE status = 'published' ORDER BY created_at DESC LIMIT 3");
+    const blogPosts = blogStmt.all();
 
     // Get section images for hero section
-    const imagesBySection = await getSectionImages();
+    const imagesBySection = getSectionImages();
     
-    // DIRECT RENDER - no complex wrapper
     res.render('index', {
       content,
       galleryImages,
@@ -323,15 +309,13 @@ app.get('/', async (req, res) => {
 });
 
 // Gallery page
-app.get('/gallery', async (req, res) => {
+app.get('/gallery', (req, res) => {
   try {
-    const content = await getAllContent();
-    const images = await new Promise(resolve => {
-      db.all('SELECT * FROM gallery_images ORDER BY created_at DESC',
-        (err, rows) => resolve(rows || []));
-    });
+    const content = getAllContent();
+    const stmt = db.prepare('SELECT * FROM gallery_images ORDER BY created_at DESC');
+    const images = stmt.all();
     
-    renderWithLayout(res, 'gallery', {
+    res.render('gallery', {
       content,
       images,
       active: 'gallery'
@@ -342,19 +326,17 @@ app.get('/gallery', async (req, res) => {
   }
 });
 
-// Separate Blog page
-app.get('/blog', async (req, res) => {
+// Blog page
+app.get('/blog', (req, res) => {
   try {
-    const content = await getAllContent();
-    const posts = await new Promise(resolve => {
-      db.all('SELECT * FROM blog_posts WHERE status = "published" ORDER BY created_at DESC',
-        (err, rows) => resolve(rows || []));
-    });
+    const content = getAllContent();
+    // FIXED: Use single quotes for string literal
+    const stmt = db.prepare("SELECT * FROM blog_posts WHERE status = 'published' ORDER BY created_at DESC");
+    const posts = stmt.all();
     
-    // Get section images for blog featured images
-    const imagesBySection = await getSectionImages();
+    const imagesBySection = getSectionImages();
     
-    renderWithLayout(res, 'blog', {
+    res.render('blog', {
       content,
       posts,
       imagesBySection,
@@ -367,20 +349,19 @@ app.get('/blog', async (req, res) => {
 });
 
 // Single blog post
-app.get('/blog/:slug', async (req, res) => {
+app.get('/blog/:slug', (req, res) => {
   try {
-    const post = await new Promise(resolve => {
-      db.get('SELECT * FROM blog_posts WHERE slug = ? AND status = "published"', [req.params.slug],
-        (err, row) => resolve(row || null));
-    });
+    // FIXED: Use single quotes for string literal
+    const stmt = db.prepare("SELECT * FROM blog_posts WHERE slug = ? AND status = 'published'");
+    const post = stmt.get(req.params.slug);
     
     if (!post) {
       return res.status(404).send('Blog post not found');
     }
     
-    const content = await getAllContent();
+    const content = getAllContent();
     
-    renderWithLayout(res, 'blog-post', {
+    res.render('blog-post', {
       content,
       post,
       active: 'blog'
@@ -392,17 +373,12 @@ app.get('/blog/:slug', async (req, res) => {
 });
 
 // Contact form submission
-app.post('/contact', async (req, res) => {
+app.post('/contact', (req, res) => {
   try {
     const { name, email, phone, message } = req.body;
     
-    await new Promise((resolve, reject) => {
-      db.run(`INSERT INTO contact_submissions (name, email, phone, message) VALUES (?, ?, ?, ?)`, 
-        [name, email, phone, message], (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-    });
+    const stmt = db.prepare('INSERT INTO contact_submissions (name, email, phone, message) VALUES (?, ?, ?, ?)');
+    stmt.run(name, email, phone, message);
     
     res.redirect('/#contact?success=1');
   } catch (error) {
@@ -411,8 +387,7 @@ app.post('/contact', async (req, res) => {
   }
 });
 
-// ==================== ADMIN ROUTES (Keep as is) ====================
-// Admin login
+// ==================== ADMIN ROUTES ====================
 app.get('/admin/login', (req, res) => {
   if (adminLoggedIn) {
     return res.redirect('/admin/dashboard');
@@ -420,7 +395,7 @@ app.get('/admin/login', (req, res) => {
   res.render('admin/login', { error: null, layout: false });
 });
 
-app.post('/admin/login', async (req, res) => {
+app.post('/admin/login', (req, res) => {
   try {
     const { password } = req.body;
     
@@ -436,29 +411,33 @@ app.post('/admin/login', async (req, res) => {
   }
 });
 
-// Admin logout
 app.post('/admin/logout', (req, res) => {
   adminLoggedIn = false;
   res.redirect('/admin/login');
 });
 
-// Admin dashboard
-app.get('/admin/dashboard', requireAuth, async (req, res) => {
+app.get('/admin/dashboard', requireAuth, (req, res) => {
   try {
-    const imagesCount = await new Promise(resolve => {
-      db.get('SELECT COUNT(*) as count FROM gallery_images', 
-        (err, row) => resolve(row ? row.count : 0));
-    });
+    const imagesCountStmt = db.prepare('SELECT COUNT(*) as count FROM gallery_images');
+    const imagesCount = imagesCountStmt.get().count;
     
-    const postsCount = await new Promise(resolve => {
-      db.get('SELECT COUNT(*) as count FROM blog_posts', 
-        (err, row) => resolve(row ? row.count : 0));
-    });
+    const postsCountStmt = db.prepare('SELECT COUNT(*) as count FROM blog_posts');
+    const postsCount = postsCountStmt.get().count;
     
-    const totalVisits = await new Promise(resolve => {
-      db.get('SELECT COUNT(*) as count FROM site_visits', 
-        (err, row) => resolve(row ? row.count : 0));
-    });
+    const totalVisitsStmt = db.prepare('SELECT COUNT(*) as count FROM site_visits');
+    const totalVisits = totalVisitsStmt.get().count;
+    
+    const todayVisitsStmt = db.prepare("SELECT COUNT(*) as count FROM site_visits WHERE DATE(visit_date) = DATE('now')");
+    const todayVisits = todayVisitsStmt.get().count;
+    
+    const contactsStmt = db.prepare('SELECT COUNT(*) as count FROM contact_submissions');
+    const contacts = contactsStmt.get().count;
+    
+    const recentImagesStmt = db.prepare('SELECT * FROM gallery_images ORDER BY created_at DESC LIMIT 5');
+    const recentImages = recentImagesStmt.all();
+    
+    const recentContactsStmt = db.prepare('SELECT * FROM contact_submissions ORDER BY submission_date DESC LIMIT 5');
+    const recentContacts = recentContactsStmt.all();
     
     res.render('admin/dashboard-sidebar', {
       title: 'Dashboard',
@@ -468,13 +447,11 @@ app.get('/admin/dashboard', requireAuth, async (req, res) => {
         images: imagesCount,
         team: 0,
         visits: totalVisits,
-        todayVisits: 0,
-        contacts: 0
+        todayVisits: todayVisits,
+        contacts: contacts
       },
-      recentImages: [],
-      heroImages: [],
-      recentContacts: [],
-      popularPages: [],
+      recentImages,
+      recentContacts,
       active: 'dashboard',
       layout: 'admin/layout-sidebar'
     });
@@ -484,9 +461,8 @@ app.get('/admin/dashboard', requireAuth, async (req, res) => {
   }
 });
 
-// Other admin routes (keep your existing ones)
-app.get('/admin/content', requireAuth, async (req, res) => {
-  const content = await getAllContent();
+app.get('/admin/content', requireAuth, (req, res) => {
+  const content = getAllContent();
   res.render('admin/content-sidebar', {
     title: 'Edit Content',
     content,
@@ -495,11 +471,12 @@ app.get('/admin/content', requireAuth, async (req, res) => {
   });
 });
 
-app.post('/admin/content', requireAuth, async (req, res) => {
+app.post('/admin/content', requireAuth, (req, res) => {
   try {
+    const stmt = db.prepare('INSERT OR REPLACE INTO content (key, value) VALUES (?, ?)');
+    
     for (const [key, value] of Object.entries(req.body)) {
-      db.run(`INSERT OR REPLACE INTO content (key, value) VALUES (?, ?)`,
-        [key, value]);
+      stmt.run(key, value);
     }
     res.redirect('/admin/content?success=1');
   } catch (error) {
@@ -508,13 +485,10 @@ app.post('/admin/content', requireAuth, async (req, res) => {
   }
 });
 
-// Section images management
-app.get('/admin/section-images', requireAuth, async (req, res) => {
+app.get('/admin/section-images', requireAuth, (req, res) => {
   try {
-    const sectionImages = await new Promise(resolve => {
-      db.all('SELECT * FROM section_images ORDER BY section, created_at DESC',
-        (err, rows) => resolve(rows || []));
-    });
+    const stmt = db.prepare('SELECT * FROM section_images ORDER BY section, created_at DESC');
+    const sectionImages = stmt.all();
     
     const imagesBySection = {};
     sectionImages.forEach(img => {
@@ -536,12 +510,12 @@ app.get('/admin/section-images', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/admin/section-images/upload', requireAuth, upload.single('image'), async (req, res) => {
+app.post('/admin/section-images/upload', requireAuth, upload.single('image'), (req, res) => {
   try {
     const { section, caption } = req.body;
     if (req.file && section) {
-      db.run(`INSERT INTO section_images (section, filename, caption) VALUES (?, ?, ?)`,
-        [section, req.file.filename, caption || '']);
+      const stmt = db.prepare('INSERT INTO section_images (section, filename, caption) VALUES (?, ?, ?)');
+      stmt.run(section, req.file.originalname, caption || '');
     }
     res.redirect('/admin/section-images?success=1');
   } catch (error) {
@@ -550,13 +524,10 @@ app.post('/admin/section-images/upload', requireAuth, upload.single('image'), as
   }
 });
 
-// Gallery management
-app.get('/admin/gallery', requireAuth, async (req, res) => {
+app.get('/admin/gallery', requireAuth, (req, res) => {
   try {
-    const images = await new Promise(resolve => {
-      db.all('SELECT * FROM gallery_images ORDER BY created_at DESC',
-        (err, rows) => resolve(rows || []));
-    });
+    const stmt = db.prepare('SELECT * FROM gallery_images ORDER BY created_at DESC');
+    const images = stmt.all();
     
     res.render('admin/gallery-sidebar', {
       title: 'Gallery Management',
@@ -572,13 +543,12 @@ app.get('/admin/gallery', requireAuth, async (req, res) => {
   }
 });
 
-// Gallery upload
-app.post('/admin/gallery/upload', requireAuth, upload.single('image'), async (req, res) => {
+app.post('/admin/gallery/upload', requireAuth, upload.single('image'), (req, res) => {
   try {
     const { caption } = req.body;
     if (req.file) {
-      db.run(`INSERT INTO gallery_images (filename, caption) VALUES (?, ?)`,
-        [req.file.filename, caption || '']);
+      const stmt = db.prepare('INSERT INTO gallery_images (filename, caption) VALUES (?, ?)');
+      stmt.run(req.file.originalname, caption || '');
     }
     res.redirect('/admin/gallery?success=1');
   } catch (error) {
@@ -587,10 +557,10 @@ app.post('/admin/gallery/upload', requireAuth, upload.single('image'), async (re
   }
 });
 
-// Gallery delete
-app.post('/admin/gallery/delete/:id', requireAuth, async (req, res) => {
+app.post('/admin/gallery/delete/:id', requireAuth, (req, res) => {
   try {
-    db.run('DELETE FROM gallery_images WHERE id = ?', [req.params.id]);
+    const stmt = db.prepare('DELETE FROM gallery_images WHERE id = ?');
+    stmt.run(req.params.id);
     res.redirect('/admin/gallery?success=1');
   } catch (error) {
     console.error('Delete error:', error);
@@ -598,14 +568,9 @@ app.post('/admin/gallery/delete/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Blog management routes (keep your existing ones)
-app.get('/admin/blog', requireAuth, async (req, res) => {
-  const posts = await new Promise(resolve => {
-    db.all('SELECT * FROM blog_posts ORDER BY created_at DESC',
-      (err, rows) => resolve(rows || []));
-  });
-  
-  console.log('Admin blog posts loaded:', posts.length, 'posts');
+app.get('/admin/blog', requireAuth, (req, res) => {
+  const stmt = db.prepare('SELECT * FROM blog_posts ORDER BY created_at DESC');
+  const posts = stmt.all();
   
   res.render('admin/blog', {
     title: 'Blog Management',
@@ -615,19 +580,15 @@ app.get('/admin/blog', requireAuth, async (req, res) => {
   });
 });
 
-app.get('/admin/blog/new', requireAuth, async (req, res) => {
-  try {
-    res.render('admin/blog-new', {
-      title: 'New Blog Post - Admin',
-      active: 'blog'
-    });
-  } catch (error) {
-    console.error('Error loading new blog page:', error);
-    res.redirect('/admin/blog?error=Cannot load new post form');
-  }
+app.get('/admin/blog/new', requireAuth, (req, res) => {
+  res.render('admin/blog-new', {
+    title: 'New Blog Post - Admin',
+    active: 'blog',
+    layout: 'admin/layout-sidebar'
+  });
 });
 
-app.post('/admin/blog/create', requireAuth, async (req, res) => {
+app.post('/admin/blog/create', requireAuth, (req, res) => {
   try {
     const { title, slug, author, excerpt, content, featured_image, status } = req.body;
     
@@ -635,7 +596,6 @@ app.post('/admin/blog/create', requireAuth, async (req, res) => {
       return res.redirect('/admin/blog/new?error=Title, Author, and Content are required');
     }
     
-    // Generate slug from title if empty
     let postSlug = slug;
     if (!postSlug || postSlug.trim() === '') {
       postSlug = title.toLowerCase()
@@ -645,22 +605,28 @@ app.post('/admin/blog/create', requireAuth, async (req, res) => {
         .trim();
     }
     
-    // Check if slug already exists
-    const existingPost = await new Promise(resolve => {
-      db.get('SELECT id FROM blog_posts WHERE slug = ?', [postSlug],
-        (err, row) => resolve(row));
-    });
+    // Check if slug exists
+    const checkStmt = db.prepare('SELECT id FROM blog_posts WHERE slug = ?');
+    const existingPost = checkStmt.get(postSlug);
     
     if (existingPost) {
       return res.redirect('/admin/blog/new?error=Slug already exists. Please use a different title.');
     }
     
     // Create new post
-    await new Promise(resolve => {
-      db.run(`INSERT INTO blog_posts (title, slug, excerpt, content, author, status, featured_image) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [title, postSlug, excerpt, content, author || 'Admin', status || 'published', featured_image],
-        resolve);
-    });
+    const insertStmt = db.prepare(
+      'INSERT INTO blog_posts (title, slug, excerpt, content, author, status, featured_image) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    
+    insertStmt.run(
+      title, 
+      postSlug, 
+      excerpt, 
+      content, 
+      author || 'Admin', 
+      status || 'published', 
+      featured_image
+    );
     
     res.redirect('/admin/blog?success=Post created successfully!');
   } catch (error) {
@@ -669,12 +635,10 @@ app.post('/admin/blog/create', requireAuth, async (req, res) => {
   }
 });
 
-app.get('/admin/blog/edit/:id', requireAuth, async (req, res) => {
+app.get('/admin/blog/edit/:id', requireAuth, (req, res) => {
   try {
-    const post = await new Promise(resolve => {
-      db.get('SELECT * FROM blog_posts WHERE id = ?', [req.params.id],
-        (err, row) => resolve(row));
-    });
+    const stmt = db.prepare('SELECT * FROM blog_posts WHERE id = ?');
+    const post = stmt.get(req.params.id);
     
     if (!post) {
       return res.redirect('/admin/blog?error=Post not found');
@@ -692,12 +656,11 @@ app.get('/admin/blog/edit/:id', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/admin/blog/update/:id', requireAuth, async (req, res) => {
+app.post('/admin/blog/update/:id', requireAuth, (req, res) => {
   try {
     const { title, slug, author, excerpt, content, featured_image, status } = req.body;
     const postId = req.params.id;
     
-    // Generate slug from title if empty
     let postSlug = slug;
     if (!postSlug || postSlug.trim() === '') {
       postSlug = title.toLowerCase()
@@ -707,12 +670,20 @@ app.post('/admin/blog/update/:id', requireAuth, async (req, res) => {
         .trim();
     }
     
-    // Update post
-    await new Promise(resolve => {
-      db.run(`UPDATE blog_posts SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, status = ?, featured_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-        [title, postSlug, excerpt, content, author || 'Admin', status || 'published', featured_image, postId],
-        resolve);
-    });
+    const updateStmt = db.prepare(
+      'UPDATE blog_posts SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, status = ?, featured_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+    );
+    
+    updateStmt.run(
+      title, 
+      postSlug, 
+      excerpt, 
+      content, 
+      author || 'Admin', 
+      status || 'published', 
+      featured_image, 
+      postId
+    );
     
     res.redirect('/admin/blog?success=Post updated successfully!');
   } catch (error) {
@@ -721,12 +692,10 @@ app.post('/admin/blog/update/:id', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/admin/blog/delete/:id', requireAuth, async (req, res) => {
+app.post('/admin/blog/delete/:id', requireAuth, (req, res) => {
   try {
-    await new Promise(resolve => {
-      db.run('DELETE FROM blog_posts WHERE id = ?', [req.params.id], resolve);
-    });
-    
+    const stmt = db.prepare('DELETE FROM blog_posts WHERE id = ?');
+    stmt.run(req.params.id);
     res.redirect('/admin/blog?success=Post deleted successfully!');
   } catch (error) {
     console.error('Error deleting blog post:', error);
@@ -734,10 +703,25 @@ app.post('/admin/blog/delete/:id', requireAuth, async (req, res) => {
   }
 });
 
-// ==================== START SERVER ====================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`🔐 Admin: http://localhost:${PORT}/admin/login`);
-  console.log(`🔑 Password: ${ADMIN_PASSWORD}`);
+// ==================== ERROR HANDLING ====================
+app.use((req, res) => {
+  res.status(404).send('Page not found');
 });
+
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).send('Internal server error');
+});
+
+// ==================== EXPORT FOR VERCEL ====================
+module.exports = app;
+
+// ==================== START SERVER ====================
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`🔐 Admin: http://localhost:${PORT}/admin/login`);
+    console.log(`🔑 Password: ${ADMIN_PASSWORD}`);
+  });
+}
