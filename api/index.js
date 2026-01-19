@@ -1,44 +1,40 @@
-﻿// server.js - VERCEL COMPATIBLE VERSION
+﻿// api/index.js - FIXED FOR VERCEL
 const express = require('express');
 const Database = require('better-sqlite3');
 const multer = require('multer');
 const path = require('path');
-const expressLayouts = require('express-ejs-layouts');
 const fs = require('fs');
 
 const app = express();
 
 // ==================== CONFIGURATION ====================
+// FIXED: Use process.cwd() for Vercel
+const rootDir = process.cwd();
+const viewsDir = path.join(rootDir, 'views');
+const publicDir = path.join(rootDir, 'public');
+
+console.log('Root directory:', rootDir);
+console.log('Views directory:', viewsDir);
+console.log('Public directory:', publicDir);
+
 app.set('view engine', 'ejs');
-app.set('views', path.join(process.cwd(), 'views'));
-app.use(express.static(path.join(process.cwd(), 'public')));
+app.set('views', viewsDir);
+
+// Serve static files - CORRECT ORDER
+app.use(express.static(publicDir));
+app.use('/css', express.static(path.join(publicDir, 'css'), {
+  maxAge: '1y'
+}));
+app.use('/js', express.static(path.join(publicDir, 'js'), {
+  maxAge: '1y'
+}));
+app.use('/uploads', express.static(path.join(publicDir, 'uploads'), {
+  maxAge: '1y'
+}));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static files
-app.use('/css', express.static(path.join(__dirname, 'public/css'), {
-  maxAge: '1y',
-  setHeaders: (res, path) => {
-    res.setHeader('Content-Type', 'text/css');
-  }
-}));
-
-app.use('/js', express.static(path.join(__dirname, 'public/js'), {
-  maxAge: '1y',
-  setHeaders: (res, path) => {
-    res.setHeader('Content-Type', 'application/javascript');
-  }
-}));
-
-app.use('/images', express.static(path.join(__dirname, 'public/images'), {
-  maxAge: '1y'
-}));
-
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
-  maxAge: '1y'
-}));
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Simple session simulation
 let adminLoggedIn = false;
