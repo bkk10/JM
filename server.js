@@ -35,6 +35,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Add this after imports
+const DEPLOY_TIME = new Date().toISOString();
+console.log(`🚀 Server starting - Deployment time: ${DEPLOY_TIME}`);
+
+// Add a middleware to check deployment
+app.use((req, res, next) => {
+  // Add deployment info to all responses
+  res.locals.deployTime = DEPLOY_TIME;
+  res.locals.deployVersion = process.env.VERCEL_GIT_COMMIT_SHA || 'local';
+  next();
+});
 
 // Simple session simulation
 let adminLoggedIn = false;

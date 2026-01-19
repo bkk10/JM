@@ -8,8 +8,57 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/admin",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/blog",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/gallery",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/contact",
+      "dest": "/server.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
     }
   ]
 }
