@@ -35,6 +35,25 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Version information
+const DEPLOY_VERSION = 'v3.0-' + Date.now();
+console.log(`🚀 Deployment version: ${DEPLOY_VERSION}`);
+
+// Add this middleware after your static file serving but before other routes
+app.use((req, res, next) => {
+  // Cache control for static files
+  if (req.path.match(/\.(css|js|jpg|jpeg|png|gif|ico)$/)) {
+    // Static assets - cache for 1 year
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+  } else {
+    // Dynamic pages - no cache
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
+
 // Add this after imports
 const DEPLOY_TIME = new Date().toISOString();
 console.log(`🚀 Server starting - Deployment time: ${DEPLOY_TIME}`);
@@ -284,6 +303,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Add version to all responses
+app.use((req, res, next) => {
+  res.locals.version = DEPLOY_VERSION;
+  next();
+});
+
 // ==================== PUBLIC ROUTES ====================
 
 // Home page
@@ -308,6 +333,7 @@ app.get('/', (req, res) => {
       blogPosts,
       imagesBySection,
       active: 'home',
+      version: DEPLOY_VERSION
     });
   } catch (error) {
     console.error('Home error:', error);
@@ -325,7 +351,8 @@ app.get('/gallery', (req, res) => {
     res.render('gallery', {
       content,
       images,
-      active: 'gallery'
+      active: 'gallery',
+      version: DEPLOY_VERSION
     });
   } catch (error) {
     console.error('Gallery error:', error);
@@ -347,7 +374,8 @@ app.get('/blog', (req, res) => {
       content,
       posts,
       imagesBySection,
-      active: 'blog'
+      active: 'blog',
+      version: DEPLOY_VERSION
     });
   } catch (error) {
     console.error('Blog error:', error);
@@ -371,7 +399,8 @@ app.get('/blog/:slug', (req, res) => {
     res.render('blog-post', {
       content,
       post,
-      active: 'blog'
+      active: 'blog',
+      version: DEPLOY_VERSION
     });
   } catch (error) {
     console.error('Blog post error:', error);
