@@ -1,11 +1,12 @@
 {
-  "name": "jedicare-medical-site",
+  "name": "jedicare-medical",
   "version": "1.0.0",
-  "description": "JediCare Care Medical centre website with admin image manager",
+  "description": "JediCare Medical Centre",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "echo 'Building...' && date > build.timestamp"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
@@ -19,8 +20,5 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }

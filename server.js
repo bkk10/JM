@@ -720,8 +720,10 @@ module.exports = app;
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`🔐 Admin: http://localhost:${PORT}/admin/login`);
-    console.log(`🔑 Password: ${ADMIN_PASSWORD}`);
+    // Add this at the very top to debug
+console.log('🚀 Server starting...');
+console.log('📅 Build time:', new Date().toISOString());
+console.log('🔧 Vercel:', process.env.VERCEL ? 'YES' : 'NO');
+console.log('🌐 NODE_ENV:', process.env.NODE_ENV || 'development');
   });
 }
