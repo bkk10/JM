@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Version information
-const DEPLOY_VERSION = 'v3.0-' + Date.now();
+const DEPLOY_VERSION = 'v5.0-' + Date.now();
 console.log(`🚀 Deployment version: ${DEPLOY_VERSION}`);
 
 // Add this middleware after your static file serving but before other routes
@@ -307,6 +307,86 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.locals.version = DEPLOY_VERSION;
   next();
+});
+
+// ==================== DIAGNOSTIC ENDPOINT ====================
+app.get('/debug', (req, res) => {
+  const diagnostics = {
+    timestamp: new Date().toISOString(),
+    version: DEPLOY_VERSION,
+    environment: process.env.VERCEL ? 'vercel' : 'local',
+    node_env: process.env.NODE_ENV,
+    public_dir: __dirname + '/public',
+    css_exists: fs.existsSync(__dirname + '/public/css/styles.css'),
+    css_path: __dirname + '/public/css/styles.css',
+    headers: req.headers,
+    user_agent: req.headers['user-agent'],
+    host: req.headers.host,
+    url: req.url,
+    method: req.method
+  };
+  
+  res.json(diagnostics);
+});
+
+// Add this after the diagnostic endpoint
+app.get('/test-css', (req, res) => {
+  const cssPath = path.join(__dirname, 'public/css/styles.css');
+  
+  try {
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    res.type('text/css').send(cssContent);
+  } catch (error) {
+    res.status(404).send('CSS file not found: ' + error.message);
+  }
+});
+
+// Direct CSS route to bypass any filesystem issues
+app.get('/css/styles.css', (req, res) => {
+  const cssPath = path.join(__dirname, 'public/css/styles.css');
+  
+  try {
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    res.type('text/css').send(cssContent);
+  } catch (error) {
+    res.status(404).send('CSS file not found: ' + error.message);
+  }
+});
+
+// DIAGNOSTIC - Add this before all other routes
+app.get('/list-files', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const listDir = (dir) => {
+    try {
+      if (fs.existsSync(dir)) {
+        return fs.readdirSync(dir).map(item => {
+          const fullPath = path.join(dir, item);
+          const stat = fs.statSync(fullPath);
+          return {
+            name: item,
+            isDirectory: stat.isDirectory(),
+            size: stat.size,
+            path: fullPath
+          };
+        });
+      }
+      return 'DIRECTORY NOT FOUND';
+    } catch (error) {
+      return 'ERROR: ' + error.message;
+    }
+  };
+  
+  res.json({
+    rootDir: __dirname,
+    filesInRoot: listDir(__dirname),
+    filesInPublic: listDir(path.join(__dirname, 'public')),
+    filesInViews: listDir(path.join(__dirname, 'views')),
+    vercelJsonExists: fs.existsSync(path.join(__dirname, 'vercel.json')),
+    packageJsonExists: fs.existsSync(path.join(__dirname, 'package.json')),
+    currentDir: process.cwd()
+  });
 });
 
 // ==================== PUBLIC ROUTES ====================
